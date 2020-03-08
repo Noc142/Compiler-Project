@@ -1,7 +1,9 @@
 %{
 	#include "syntax.tab.h"
-	#include "syntaxtree.h"
+	#include "stdio.h"
+	//#include "syntaxtree.h"
 	int yycolumn = 1;
+	int errorLexical = 0;
 	#define YY_USER_ACTION \
 		yylloc.first_line = yylloc.last_line = yylineno; \
 		yylloc.first_column = yycolumn; \
@@ -43,66 +45,75 @@ RETURN return
 IF if
 ELSE else
 WHILE while
+LINEANNO \/\/.*
 
 %%
 {WS} {}
-{FLOAT} { printf("FLOAT\n"); 
+{FLOAT} {  
 	yylval.type_node = newNode(yylineno, FLOAT, yytext); 
 return FLOAT;
 
 }
-{INT} { printf("INT\n"); yylval.type_node = newNode(yylineno, INT, yytext); return INT;
+{INT} {  yylval.type_node = newNode(yylineno, INT, yytext); return INT;
 }
-{SEMI} { printf("SEMI\n"); yylval.type_node = newNode(yylineno, SEMI, yytext); return SEMI;
+{SEMI} { yylval.type_node = newNode(yylineno, SEMI, yytext); return SEMI;
 }
-{COMMA} { printf("COMMA\n"); yylval.type_node = newNode(yylineno, COMMA, yytext); return COMMA;
+{COMMA} { yylval.type_node = newNode(yylineno, COMMA, yytext); return COMMA;
 }
-{ASSIGNOP} { printf("ASSIGNOP\n"); yylval.type_node = newNode(yylineno, ASSIGNOP, yytext);return ASSIGNOP;
+{ASSIGNOP} { yylval.type_node = newNode(yylineno, ASSIGNOP, yytext);return ASSIGNOP;
 }
-{RELOP} { printf("RELOP\n"); yylval.type_node = newNode(yylineno, RELOP, yytext); return RELOP;
+{RELOP} { yylval.type_node = newNode(yylineno, RELOP, yytext); return RELOP;
 }
-{PLUS} { printf("PLUS\n"); yylval.type_node = newNode(yylineno, PLUS, yytext); return PLUS;
+{PLUS} { yylval.type_node = newNode(yylineno, PLUS, yytext); return PLUS;
 }
-{MINUS} { printf("MINUS\n"); yylval.type_node = newNode(yylineno, MINUS, yytext); return MINUS;
+{MINUS} { yylval.type_node = newNode(yylineno, MINUS, yytext); return MINUS;
 }
-{STAR} { printf("STAR\n"); yylval.type_node = newNode(yylineno, STAR, yytext); return STAR;
+{STAR} { yylval.type_node = newNode(yylineno, STAR, yytext); return STAR;
 }
-{DIV} { printf("DIV\n"); yylval.type_node = newNode(yylineno, DIV, yytext); return DIV;
+{DIV} { yylval.type_node = newNode(yylineno, DIV, yytext); return DIV;
 }
-{AND} { printf("AND\n"); yylval.type_node = newNode(yylineno, AND, yytext); return AND;
+{AND} { yylval.type_node = newNode(yylineno, AND, yytext); return AND;
 }
-{OR} { printf("OR\n"); yylval.type_node = newNode(yylineno, OR, yytext); return OR;
+{OR} { yylval.type_node = newNode(yylineno, OR, yytext); return OR;
 }
-{DOT} { printf("DOT\n"); yylval.type_node = newNode(yylineno, DOT, yytext); return DOT;
+{DOT} { yylval.type_node = newNode(yylineno, DOT, yytext); return DOT;
 }
-{NOT} { printf("NOT\n"); yylval.type_node = newNode(yylineno, NOT, yytext); return NOT;
+{NOT} { yylval.type_node = newNode(yylineno, NOT, yytext); return NOT;
 }
-{TYPE} { printf("TYPE\n"); yylval.type_node = newNode(yylineno, TYPE, yytext); return TYPE;
+{TYPE} { yylval.type_node = newNode(yylineno, TYPE, yytext); return TYPE;
 }
-{LP} { printf("LP\n"); yylval.type_node = newNode(yylineno, LP, yytext); return LP;
+{LP} { yylval.type_node = newNode(yylineno, LP, yytext); return LP;
 }
-{RP} { printf("RP\n"); yylval.type_node = newNode(yylineno, RP, yytext); return RP;
+{RP} { yylval.type_node = newNode(yylineno, RP, yytext); return RP;
 }
-{LB} { printf("LB\n"); yylval.type_node = newNode(yylineno, LB, yytext); return LB;
+{LB} { yylval.type_node = newNode(yylineno, LB, yytext); return LB;
 }
-{RB} { printf("RB\n"); yylval.type_node = newNode(yylineno, RB, yytext); return RB;
+{RB} { yylval.type_node = newNode(yylineno, RB, yytext); return RB;
 }
-{LC} { printf("LC\n");yylval.type_node = newNode(yylineno, LC, yytext); return LC;
+{LC} { yylval.type_node = newNode(yylineno, LC, yytext); return LC;
 }
-{RC} { printf("RC\n"); yylval.type_node = newNode(yylineno, RC, yytext); return RC;
+{RC} { yylval.type_node = newNode(yylineno, RC, yytext); return RC;
 }
-{STRUCT} { printf("STRUCT\n"); yylval.type_node = newNode(yylineno, STRUCT, yytext); return STRUCT;
+{STRUCT} { yylval.type_node = newNode(yylineno, STRUCT, yytext); return STRUCT;
 }
-{RETURN} { printf("RETURN\n"); yylval.type_node = newNode(yylineno, RETURN, yytext); return RETURN;
+{RETURN} { yylval.type_node = newNode(yylineno, RETURN, yytext); return RETURN;
 }
-{IF} { printf("IF\n"); yylval.type_node = newNode(yylineno, IF, yytext); return IF;
+{IF} { yylval.type_node = newNode(yylineno, IF, yytext); return IF;
 }
-{ELSE} { printf("ELSE\n"); yylval.type_node = newNode(yylineno, ELSE, yytext); return ELSE;
+{ELSE} { yylval.type_node = newNode(yylineno, ELSE, yytext); return ELSE;
 } 
-{WHILE}  { printf("WHILE\n"); yylval.type_node = newNode(yylineno, WHILE, yytext); return WHILE;
+{WHILE}  { yylval.type_node = newNode(yylineno, WHILE, yytext); return WHILE;
 }
-{ID} { printf("ID\n"); yylval.type_node = newNode(yylineno, ID, yytext); return ID;
+{ID} { yylval.type_node = newNode(yylineno, ID, yytext); return ID;
 }
+{LINEANNO} {printf("ANNO\n");}
+"/*" { char c = input(); 
+	while (c != EOF) {
+		if (c == '*') {
+			c = input();
+			if (c == '/')
+		}
+	}
 . {  printf("Error type A at Line %d: Mysterious characters\'%s\'\n", yylineno, yytext);}
 \n { yycolumn = 1; 
 }

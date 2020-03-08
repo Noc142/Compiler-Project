@@ -6,6 +6,8 @@
 	#include "lex.yy.c"
 	//#define YYDEBUG 1
 	struct ASTNode *treeroot;
+	extern int errorLexical;
+	int errorSyntax = 0;
 %}
 %union {
 	int type_int;
@@ -54,6 +56,7 @@ ExtDefList : ExtDef ExtDefList { $$ = newNode(@$.first_line, ExtDefList, NULL); 
 ExtDef : Specifier ExtDecList SEMI { $$ = newNode(@$.first_line, ExtDef, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| Specifier SEMI { $$ = newNode(@$.first_line, ExtDef, NULL); insertChildren($$, buildChildren(2, $1, $2));}
 	| Specifier FunDec CompSt { $$ = newNode(@$.first_line, ExtDef, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
+	| error SEMI { errorSyntax = 1; }
 	;
 ExtDecList : VarDec { $$ = newNode(@$.first_line, ExtDecList, NULL); insertChildren($$, buildChildren(1, $1));}
 	| VarDec COMMA ExtDecList { $$ = newNode(@$.first_line, ExtDecList, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
@@ -65,6 +68,7 @@ Specifier : TYPE { $$ = newNode(@$.first_line, Specifier, NULL); insertChildren(
 	;
 StructSpecifier : STRUCT OptTag LC DefList RC { $$ = newNode(@$.first_line, StructSpecifier, NULL); insertChildren($$, buildChildren(5, $1, $2, $3, $4, $5));}
 	| STRUCT Tag { $$ = newNode(@$.first_line, StructSpecifier, NULL); insertChildren($$, buildChildren(2, $1, $2));}
+	| error RC { errorSyntax = 1; }
 	;
 OptTag : ID { $$ = newNode(@$.first_line, OptTag, NULL); insertChildren($$, buildChildren(1, $1));}
 	| /*empty*/ { $$ = NULL;}
@@ -78,6 +82,7 @@ VarDec : ID { $$ = newNode(@$.first_line, VarDec, NULL); insertChildren($$, buil
 	;
 FunDec : ID LP VarList RP { $$ = newNode(@$.first_line, FunDec, NULL); insertChildren($$, buildChildren(4, $1, $2, $3, $4));}
 	| ID LP RP { $$ = newNode(@$.first_line, FunDec, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
+	| error RP { errorSyntax = 1; }
 	;
 VarList : ParamDec COMMA VarList { $$ = newNode(@$.first_line, VarList, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| ParamDec { $$ = newNode(@$.first_line, VarList, NULL); insertChildren($$, buildChildren(1, $1));}
@@ -88,6 +93,7 @@ ParamDec : Specifier VarDec { $$ = newNode(@$.first_line, ParamDec, NULL); inser
 
 /*Statements*/
 CompSt : LC DefList StmtList RC { $$ = newNode(@$.first_line, CompSt, NULL); insertChildren($$, buildChildren(4, $1, $2, $3, $4)); }
+	| error RC { errorSyntax = 1; }
 	;
 StmtList : Stmt StmtList { $$ = newNode(@$.first_line, StmtList, NULL); insertChildren($$, buildChildren(2, $1, $2));}
 	| /*empty*/ { $$ = NULL;}
@@ -98,6 +104,7 @@ Stmt : Exp SEMI { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, bu
 	| IF LP Exp RP Stmt %prec LOWER_THAN_ELSE { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, buildChildren(5, $1, $2, $3, $4, $5));}
 	| IF LP Exp RP Stmt ELSE Stmt { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, buildChildren(7, $1, $2, $3, $4, $5, $6, $7));}
 	| WHILE LP Exp RP Stmt { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, buildChildren(5, $1, $2, $3, $4, $5));}
+	| error SEMI { errorSyntax = 1; }
 	;
 
 
@@ -106,6 +113,7 @@ DefList : Def DefList { $$ = newNode(@$.first_line, DefList, NULL); insertChildr
 	| /*empty*/ {$$ = NULL;}
 	;
 Def : Specifier DecList SEMI { $$ = newNode(@$.first_line, Def, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
+	| error RC { errorSyntax = 1; }	
 	;
 DecList : Dec { $$ = newNode(@$.first_line, DecList, NULL); insertChildren($$, buildChildren(1, $1));}
 	| Dec COMMA DecList { $$ = newNode(@$.first_line, DecList, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
@@ -134,6 +142,7 @@ Exp : Exp ASSIGNOP Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren(
 	| ID { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(1, $1));}
 	| INT { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(1, $1));}
 	| FLOAT { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(1, $1));}
+	| 
 	;
 Args : Exp COMMA Args { $$ = newNode(@$.first_line, Args, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| Exp { $$ = newNode(@$.first_line, Args, NULL); insertChildren($$, buildChildren(1, $1));}
@@ -155,10 +164,11 @@ int main(int argc, char **argv) {
 	//yydebug = 1;
 	yyparse();
 	printf("parse over\n");
+	if (errorLexical || errorSyntax) return 0;
 	preOrderShow(treeroot, 0);
 	deleteTree(treeroot);
 	return 0;
 }
 yyerror(char* msg) {
-	fprintf(stderr, "error: %s\n", msg);
+	fprintf(stderr, "Error type B at Line %d: %s\n", msg);
 }
