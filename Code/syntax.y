@@ -9,6 +9,7 @@
 	extern int errorLexical;
 	int errorSyntax = 0;
 	extern int yyerror(char*);
+	extern int synerror(char *);
 %}
 %union {
 	int type_int;
@@ -57,7 +58,8 @@ ExtDefList : ExtDef ExtDefList { $$ = newNode(@$.first_line, ExtDefList, NULL); 
 ExtDef : Specifier ExtDecList SEMI { $$ = newNode(@$.first_line, ExtDef, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| Specifier SEMI { $$ = newNode(@$.first_line, ExtDef, NULL); insertChildren($$, buildChildren(2, $1, $2));}
 	| Specifier FunDec CompSt { $$ = newNode(@$.first_line, ExtDef, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
-	| Specifier ExtDecList error SEMI { errorSyntax = 1; printf("Error type B at Line %d: Missing \";\".\n",yylineno);}	
+	| Specifier ExtDecList error { errorSyntax = 1; synerror("Missing \";\".");}	
+	| Specifier error { errorSyntax = 1; synerror("Missing \";\".");}
 	;
 ExtDecList : VarDec { $$ = newNode(@$.first_line, ExtDecList, NULL); insertChildren($$, buildChildren(1, $1));}
 	| VarDec COMMA ExtDecList { $$ = newNode(@$.first_line, ExtDecList, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}	
@@ -82,8 +84,8 @@ VarDec : ID { $$ = newNode(@$.first_line, VarDec, NULL); insertChildren($$, buil
 	;
 FunDec : ID LP VarList RP { $$ = newNode(@$.first_line, FunDec, NULL); insertChildren($$, buildChildren(4, $1, $2, $3, $4));}
 	| ID LP RP { $$ = newNode(@$.first_line, FunDec, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
-	| ID LP VarList error RP { printf("Error type B at Line %d: Missing \")\".\n",yylineno);}		
-	| ID LP error RP { printf("Error type B at Line %d: Wrong variable list.\n",yylineno);}		
+	| ID LP VarList error RP { synerror("Missing \")\".");}		
+	| ID LP error RP { synerror("Wrong variable list.");}		
 	;
 VarList : ParamDec COMMA VarList { $$ = newNode(@$.first_line, VarList, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| ParamDec { $$ = newNode(@$.first_line, VarList, NULL); insertChildren($$, buildChildren(1, $1));}
@@ -94,7 +96,7 @@ ParamDec : Specifier VarDec { $$ = newNode(@$.first_line, ParamDec, NULL); inser
 
 /*Statements*/
 CompSt : LC DefList StmtList RC { $$ = newNode(@$.first_line, CompSt, NULL); insertChildren($$, buildChildren(4, $1, $2, $3, $4)); }
-	| LC DefList StmtList error { errorSyntax = 1; printf("Error type B at Line %d: Missing \"}\".\n",yylineno);}		
+	| LC DefList StmtList error { errorSyntax = 1; synerror("Missing \"}\".");}		
 	;
 StmtList : Stmt StmtList { $$ = newNode(@$.first_line, StmtList, NULL); insertChildren($$, buildChildren(2, $1, $2));}
 	| /*empty*/ { $$ = NULL;}
@@ -102,11 +104,11 @@ StmtList : Stmt StmtList { $$ = newNode(@$.first_line, StmtList, NULL); insertCh
 Stmt : Exp SEMI { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, buildChildren(2, $1, $2));}
 	| CompSt { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, buildChildren(1, $1));}
 	| RETURN Exp SEMI { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
-	| RETURN Exp error  {printf("Error type B at Line %d: Missing \";\".\n",yylineno);}	
+	| RETURN Exp error  { synerror("Missing \";\".");}	
 	| IF LP Exp RP Stmt %prec LOWER_THAN_ELSE { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, buildChildren(5, $1, $2, $3, $4, $5));}
 	| IF LP Exp RP Stmt ELSE Stmt { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, buildChildren(7, $1, $2, $3, $4, $5, $6, $7));}
 	| WHILE LP Exp RP Stmt { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, buildChildren(5, $1, $2, $3, $4, $5));}
-	| Exp error SEMI { errorSyntax = 1; printf("Error type B at Line %d: Missing \";\".\n",yylineno);}		
+	| Exp error { errorSyntax = 1; synerror("Missing \";\".");}		
 	;
 
 
@@ -115,9 +117,9 @@ DefList : Def DefList { $$ = newNode(@$.first_line, DefList, NULL); insertChildr
 	| /*empty*/ {$$ = NULL;}
 	;
 Def : Specifier DecList SEMI { $$ = newNode(@$.first_line, Def, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
-	| Specifier error SEMI 	{ errorSyntax = 1; printf("Error type B at Line %d: Wrong defination.\n",yylineno);}
-	| Specifier	DecList error { errorSyntax = 1; printf("Error type B at Line %d: Missing \";\".\n",yylineno);}
-	| error SEMI { errorSyntax = 1; printf("Error type B at Line %d: Wrong defination.\n", yylineno); }
+	| Specifier error SEMI 	{ errorSyntax = 1; synerror("Wrong defination.");}
+	| Specifier	DecList error { errorSyntax = 1; synerror("Missing \";\".");}
+	| error SEMI { errorSyntax = 1; synerror("Wrong defination."); }
 	;
 DecList : Dec { $$ = newNode(@$.first_line, DecList, NULL); insertChildren($$, buildChildren(1, $1));}
 	| Dec COMMA DecList { $$ = newNode(@$.first_line, DecList, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
@@ -143,16 +145,16 @@ Exp : Exp ASSIGNOP Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren(
 	| ID LP Args RP { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(4, $1, $2, $3, $4));}
 	| ID LP RP { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| Exp LB Exp RB { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(4, $1, $2, $3, $4));}
-	| Exp LB error RB { errorSyntax = 1; printf("Error type B at Line %d: Wrong expression in \"[]\".\n",yylineno);}
-	| Exp LB Exp error RB { errorSyntax = 1; printf("Error type B at Line %d: Missing \"]\".\n",yylineno);}
-	| Exp ASSIGNOP error { errorSyntax = 1; printf("Error type B at Line %d: Wrong \"=\" expression.\n",yylineno);}
-	| Exp AND error { errorSyntax = 1; printf("Error type B at Line %d: Wrong \"&&\" expression.\n",yylineno);}
-	| Exp OR error { errorSyntax = 1; printf("Error type B at Line %d: Wrong \"||\" expression.\n",yylineno);}
-	| Exp RELOP error { errorSyntax = 1; printf("Error type B at Line %d: Wrong \"relop\" expression.\n",yylineno);}
-	| Exp PLUS error { errorSyntax = 1; printf("Error type B at Line %d: Wrong \"+\" expression.\n",yylineno);}
-	| Exp MINUS error { errorSyntax = 1; printf("Error type B at Line %d: Wrong \"-\" expression.\n",yylineno);}
-	| Exp STAR error { errorSyntax = 1; printf("Error type B at Line %d: Wrong \"*\" expression.\n",yylineno);}
-	| Exp DIV error { errorSyntax = 1; printf("Error type B at Line %d: Wrong \"/\" expression.\n",yylineno);}
+	| Exp LB error RB { errorSyntax = 1; synerror("Wrong expression in \"[]\".");}
+	| Exp LB Exp error RB { errorSyntax = 1; synerror("Missing \"]\".");}
+	| Exp ASSIGNOP error { errorSyntax = 1; synerror("Wrong \"=\" expression.");}
+	| Exp AND error { errorSyntax = 1; synerror("Wrong \"&&\" expression.");}
+	| Exp OR error { errorSyntax = 1; synerror("Wrong \"||\" expression.");}
+	| Exp RELOP error { errorSyntax = 1; synerror("Wrong \"relop\" expression.");}
+	| Exp PLUS error { errorSyntax = 1; synerror("Wrong \"+\" expression.");}
+	| Exp MINUS error { errorSyntax = 1; synerror("Wrong \"-\" expression.");}
+	| Exp STAR error { errorSyntax = 1; synerror("Wrong \"*\" expression.");}
+	| Exp DIV error { errorSyntax = 1; synerror("Wrong \"/\" expression.");}
 	| Exp DOT ID { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| ID { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(1, $1));}
 	| INT { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(1, $1));}
@@ -160,7 +162,7 @@ Exp : Exp ASSIGNOP Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren(
 	;
 Args : Exp COMMA Args { $$ = newNode(@$.first_line, Args, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| Exp { $$ = newNode(@$.first_line, Args, NULL); insertChildren($$, buildChildren(1, $1));}
-	| Exp error Args {printf("Error type B at Line %d: Missing comma ',' between args.\n",yylineno);}	
+	//| Exp error Args {synerror("Missing comma ',' between args.");}	
 	;
 
 %%
@@ -179,11 +181,17 @@ int main(int argc, char **argv) {
 	//yydebug = 1;
 	yyparse();
 	printf("parse over\n");
+	if (errorLexical) fprintf(stderr, "Lexical errors exist!\n");
+	if (errorSyntax) fprintf(stderr, "Syntax errors exist!\n");
 	if (errorLexical || errorSyntax) return 0;
 	preOrderShow(treeroot, 0);
 	deleteTree(treeroot);
 	return 0;
 }
 int yyerror(char* msg) {
+	errorSyntax = 1;
 	//fprintf(stderr, "Error type B at Line %d: %s\n",yylineno,msg);
+}
+int synerror(char *msg) {
+	fprintf(stderr, "Error type B at Line %d: %s\n", yylineno, msg);
 }
