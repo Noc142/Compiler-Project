@@ -23,7 +23,7 @@ struct ASTNode *buildChildren(int num, ...) {
 	va_start(ap, num);
 	int i = 1;
 	struct ASTNode *ret = va_arg(ap, struct ASTNode*);
-	while (ret == NULL) {
+	while (ret == NULL && i < num) {
 		ret = va_arg(ap, struct ASTNode*);
 		++i;
 	}

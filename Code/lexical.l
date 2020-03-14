@@ -106,15 +106,26 @@ return FLOAT;
 }
 {ID} { yylval.type_node = newNode(yylineno, ID, yytext); return ID;
 }
-{LINEANNO} {printf("ANNO\n");}
-"/*" { char c = input(); 
-	while (c != EOF) {
+{LINEANNO} {}
+"/*" { 
+	int flag = 0;
+	char c = input(); 
+	while (c != 0) {
 		if (c == '*') {
 			c = input();
-			if (c == '/')
+			if (c == '/') {
+				flag = 1; break;
+			}
+			else unput(c);
 		}
+		c = input();
 	}
-. {  printf("Error type A at Line %d: Mysterious characters\'%s\'\n", yylineno, yytext);}
+	if (flag == 0) {
+		printf("Error type A at Line %d: Unterminated Comment\n", yylineno);
+		errorLexical = 1;
+	}
+}
+. {  errorLexical = 1;printf("Error type A at Line %d: Mysterious characters\'%s\'\n", yylineno, yytext);}
 \n { yycolumn = 1; 
 }
 %%
