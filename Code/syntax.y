@@ -118,7 +118,7 @@ DefList : Def DefList { $$ = newNode(@$.first_line, DefList, NULL); insertChildr
 	;
 Def : Specifier DecList SEMI { $$ = newNode(@$.first_line, Def, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| Specifier error SEMI 	{ errorSyntax = 1; synerror("Wrong defination.");}
-	| Specifier	DecList error { errorSyntax = 1; synerror("Missing \";\".");}
+	| Specifier	DecList error { errorSyntax = 1; synerror("fuckMissing \";\".");}
 	| error SEMI { errorSyntax = 1; synerror("Wrong defination."); }
 	;
 DecList : Dec { $$ = newNode(@$.first_line, DecList, NULL); insertChildren($$, buildChildren(1, $1));}
@@ -139,10 +139,11 @@ Exp : Exp ASSIGNOP Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren(
 	| Exp STAR Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| Exp DIV Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| LP Exp RP { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
-	| LP Exp error RP { errorSyntax = 1; printf("Error type B at Line %d: Missing \")\".\n",yylineno);}
+	| LP Exp error { errorSyntax = 1; synerror("Missing \")\".");}
 	| MINUS Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(2, $1, $2));}
 	| NOT Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(2, $1, $2));}
 	| ID LP Args RP { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(4, $1, $2, $3, $4));}
+	| ID LP Args error { synerror("Missing \")\"."); }
 	| ID LP RP { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| Exp LB Exp RB { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(4, $1, $2, $3, $4));}
 	| Exp LB error RB { errorSyntax = 1; synerror("Wrong expression in \"[]\".");}
@@ -162,7 +163,7 @@ Exp : Exp ASSIGNOP Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren(
 	;
 Args : Exp COMMA Args { $$ = newNode(@$.first_line, Args, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| Exp { $$ = newNode(@$.first_line, Args, NULL); insertChildren($$, buildChildren(1, $1));}
-	//| Exp error Args {synerror("Missing comma ',' between args.");}	
+	| Exp error Args {synerror("Missing comma ',' between args.");}	
 	;
 
 %%

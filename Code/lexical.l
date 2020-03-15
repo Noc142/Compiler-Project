@@ -46,7 +46,8 @@ IF if
 ELSE else
 WHILE while
 LINEANNO \/\/.*
-
+ERRORFLOAT {DIGIT}{DOT}{DIGIT}*{LETTER_}+[{DIGIT}{LETTER_}]*
+ERRORINT {DIGIT}+{LETTER_}+[{DIGIT}{LETTER_}]*
 %%
 {WS} {}
 {FLOAT} {  
@@ -106,6 +107,8 @@ return FLOAT;
 }
 {ID} { yylval.type_node = newNode(yylineno, ID, yytext); return ID;
 }
+{ERRORFLOAT} {errorLexical = 1;fprintf(stderr, "Error type A at Line %d: Illegal floating number \"%s\".\n", yylineno, yytext);}
+{ERRORINT} {errorLexical = 1;fprintf(stderr, "Error type A at Line %d: Illegal integral number \"%s\".\n", yylineno, yytext);}
 {LINEANNO} {}
 "/*" { 
 	int flag = 0;
@@ -121,11 +124,11 @@ return FLOAT;
 		c = input();
 	}
 	if (flag == 0) {
-		printf("Error type A at Line %d: Unterminated Comment\n", yylineno);
+		fprintf(stderr, "Error type A at Line %d: Unterminated Comment\n", yylineno);
 		errorLexical = 1;
 	}
 }
-. {  errorLexical = 1;printf("Error type A at Line %d: Mysterious characters\'%s\'\n", yylineno, yytext);}
+. {  errorLexical = 1;fprintf(stderr, "Error type A at Line %d: Mysterious characters\'%s\'\n", yylineno, yytext);}
 \n { yycolumn = 1; 
 }
 %%
