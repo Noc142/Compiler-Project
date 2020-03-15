@@ -51,61 +51,61 @@ ERRORINT {DIGIT}+{LETTER_}+[{DIGIT}{LETTER_}]*
 %%
 {WS} {}
 {FLOAT} {  
-	yylval.type_node = newNode(yylineno, FLOAT, yytext); 
+	yylval.type_node = newNode(yylineno, FLOAT, yytext, 0); 
 return FLOAT;
 
 }
-{INT} {  yylval.type_node = newNode(yylineno, INT, yytext); return INT;
+{INT} {  yylval.type_node = newNode(yylineno, INT, yytext, 0); return INT;
 }
-{SEMI} { yylval.type_node = newNode(yylineno, SEMI, yytext); return SEMI;
+{SEMI} { yylval.type_node = newNode(yylineno, SEMI, yytext, 0); return SEMI;
 }
-{COMMA} { yylval.type_node = newNode(yylineno, COMMA, yytext); return COMMA;
+{COMMA} { yylval.type_node = newNode(yylineno, COMMA, yytext, 0); return COMMA;
 }
-{ASSIGNOP} { yylval.type_node = newNode(yylineno, ASSIGNOP, yytext);return ASSIGNOP;
+{ASSIGNOP} { yylval.type_node = newNode(yylineno, ASSIGNOP, yytext, 0);return ASSIGNOP;
 }
-{RELOP} { yylval.type_node = newNode(yylineno, RELOP, yytext); return RELOP;
+{RELOP} { yylval.type_node = newNode(yylineno, RELOP, yytext, 0); return RELOP;
 }
-{PLUS} { yylval.type_node = newNode(yylineno, PLUS, yytext); return PLUS;
+{PLUS} { yylval.type_node = newNode(yylineno, PLUS, yytext, 0); return PLUS;
 }
-{MINUS} { yylval.type_node = newNode(yylineno, MINUS, yytext); return MINUS;
+{MINUS} { yylval.type_node = newNode(yylineno, MINUS, yytext, 0); return MINUS;
 }
-{STAR} { yylval.type_node = newNode(yylineno, STAR, yytext); return STAR;
+{STAR} { yylval.type_node = newNode(yylineno, STAR, yytext, 0); return STAR;
 }
-{DIV} { yylval.type_node = newNode(yylineno, DIV, yytext); return DIV;
+{DIV} { yylval.type_node = newNode(yylineno, DIV, yytext, 0); return DIV;
 }
-{AND} { yylval.type_node = newNode(yylineno, AND, yytext); return AND;
+{AND} { yylval.type_node = newNode(yylineno, AND, yytext, 0); return AND;
 }
-{OR} { yylval.type_node = newNode(yylineno, OR, yytext); return OR;
+{OR} { yylval.type_node = newNode(yylineno, OR, yytext, 0); return OR;
 }
-{DOT} { yylval.type_node = newNode(yylineno, DOT, yytext); return DOT;
+{DOT} { yylval.type_node = newNode(yylineno, DOT, yytext, 0); return DOT;
 }
-{NOT} { yylval.type_node = newNode(yylineno, NOT, yytext); return NOT;
+{NOT} { yylval.type_node = newNode(yylineno, NOT, yytext, 0); return NOT;
 }
-{TYPE} { yylval.type_node = newNode(yylineno, TYPE, yytext); return TYPE;
+{TYPE} { yylval.type_node = newNode(yylineno, TYPE, yytext, 0); return TYPE;
 }
-{LP} { yylval.type_node = newNode(yylineno, LP, yytext); return LP;
+{LP} { yylval.type_node = newNode(yylineno, LP, yytext, 0); return LP;
 }
-{RP} { yylval.type_node = newNode(yylineno, RP, yytext); return RP;
+{RP} { yylval.type_node = newNode(yylineno, RP, yytext, 0); return RP;
 }
-{LB} { yylval.type_node = newNode(yylineno, LB, yytext); return LB;
+{LB} { yylval.type_node = newNode(yylineno, LB, yytext, 0); return LB;
 }
-{RB} { yylval.type_node = newNode(yylineno, RB, yytext); return RB;
+{RB} { yylval.type_node = newNode(yylineno, RB, yytext, 0); return RB;
 }
-{LC} { yylval.type_node = newNode(yylineno, LC, yytext); return LC;
+{LC} { yylval.type_node = newNode(yylineno, LC, yytext, 0); return LC;
 }
-{RC} { yylval.type_node = newNode(yylineno, RC, yytext); return RC;
+{RC} { yylval.type_node = newNode(yylineno, RC, yytext, 0); return RC;
 }
-{STRUCT} { yylval.type_node = newNode(yylineno, STRUCT, yytext); return STRUCT;
+{STRUCT} { yylval.type_node = newNode(yylineno, STRUCT, yytext, 0); return STRUCT;
 }
-{RETURN} { yylval.type_node = newNode(yylineno, RETURN, yytext); return RETURN;
+{RETURN} { yylval.type_node = newNode(yylineno, RETURN, yytext, 0); return RETURN;
 }
-{IF} { yylval.type_node = newNode(yylineno, IF, yytext); return IF;
+{IF} { yylval.type_node = newNode(yylineno, IF, yytext, 0); return IF;
 }
-{ELSE} { yylval.type_node = newNode(yylineno, ELSE, yytext); return ELSE;
+{ELSE} { yylval.type_node = newNode(yylineno, ELSE, yytext, 0); return ELSE;
 } 
-{WHILE}  { yylval.type_node = newNode(yylineno, WHILE, yytext); return WHILE;
+{WHILE}  { yylval.type_node = newNode(yylineno, WHILE, yytext, 0); return WHILE;
 }
-{ID} { yylval.type_node = newNode(yylineno, ID, yytext); return ID;
+{ID} { yylval.type_node = newNode(yylineno, ID, yytext, 0); return ID;
 }
 {ERRORFLOAT} {errorLexical = 1;fprintf(stderr, "Error type A at Line %d: Illegal floating number \"%s\".\n", yylineno, yytext);}
 {ERRORINT} {errorLexical = 1;fprintf(stderr, "Error type A at Line %d: Illegal integral number \"%s\".\n", yylineno, yytext);}

@@ -837,7 +837,7 @@ case 2:
 YY_RULE_SETUP
 #line 53 "./lexical.l"
 {  
-	yylval.type_node = newNode(yylineno, FLOAT, yytext); 
+	yylval.type_node = newNode(yylineno, FLOAT, yytext, 0); 
 return FLOAT;
 
 }
@@ -845,157 +845,157 @@ return FLOAT;
 case 3:
 YY_RULE_SETUP
 #line 58 "./lexical.l"
-{  yylval.type_node = newNode(yylineno, INT, yytext); return INT;
+{  yylval.type_node = newNode(yylineno, INT, yytext, 0); return INT;
 }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 60 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, SEMI, yytext); return SEMI;
+{ yylval.type_node = newNode(yylineno, SEMI, yytext, 0); return SEMI;
 }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 62 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, COMMA, yytext); return COMMA;
+{ yylval.type_node = newNode(yylineno, COMMA, yytext, 0); return COMMA;
 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 64 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, ASSIGNOP, yytext);return ASSIGNOP;
+{ yylval.type_node = newNode(yylineno, ASSIGNOP, yytext, 0);return ASSIGNOP;
 }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 66 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, RELOP, yytext); return RELOP;
+{ yylval.type_node = newNode(yylineno, RELOP, yytext, 0); return RELOP;
 }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
 #line 68 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, PLUS, yytext); return PLUS;
+{ yylval.type_node = newNode(yylineno, PLUS, yytext, 0); return PLUS;
 }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
 #line 70 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, MINUS, yytext); return MINUS;
+{ yylval.type_node = newNode(yylineno, MINUS, yytext, 0); return MINUS;
 }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
 #line 72 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, STAR, yytext); return STAR;
+{ yylval.type_node = newNode(yylineno, STAR, yytext, 0); return STAR;
 }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
 #line 74 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, DIV, yytext); return DIV;
+{ yylval.type_node = newNode(yylineno, DIV, yytext, 0); return DIV;
 }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
 #line 76 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, AND, yytext); return AND;
+{ yylval.type_node = newNode(yylineno, AND, yytext, 0); return AND;
 }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
 #line 78 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, OR, yytext); return OR;
+{ yylval.type_node = newNode(yylineno, OR, yytext, 0); return OR;
 }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
 #line 80 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, DOT, yytext); return DOT;
+{ yylval.type_node = newNode(yylineno, DOT, yytext, 0); return DOT;
 }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
 #line 82 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, NOT, yytext); return NOT;
+{ yylval.type_node = newNode(yylineno, NOT, yytext, 0); return NOT;
 }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
 #line 84 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, TYPE, yytext); return TYPE;
+{ yylval.type_node = newNode(yylineno, TYPE, yytext, 0); return TYPE;
 }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 86 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, LP, yytext); return LP;
+{ yylval.type_node = newNode(yylineno, LP, yytext, 0); return LP;
 }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 88 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, RP, yytext); return RP;
+{ yylval.type_node = newNode(yylineno, RP, yytext, 0); return RP;
 }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 90 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, LB, yytext); return LB;
+{ yylval.type_node = newNode(yylineno, LB, yytext, 0); return LB;
 }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 92 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, RB, yytext); return RB;
+{ yylval.type_node = newNode(yylineno, RB, yytext, 0); return RB;
 }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 94 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, LC, yytext); return LC;
+{ yylval.type_node = newNode(yylineno, LC, yytext, 0); return LC;
 }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 96 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, RC, yytext); return RC;
+{ yylval.type_node = newNode(yylineno, RC, yytext, 0); return RC;
 }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 98 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, STRUCT, yytext); return STRUCT;
+{ yylval.type_node = newNode(yylineno, STRUCT, yytext, 0); return STRUCT;
 }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 100 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, RETURN, yytext); return RETURN;
+{ yylval.type_node = newNode(yylineno, RETURN, yytext, 0); return RETURN;
 }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 102 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, IF, yytext); return IF;
+{ yylval.type_node = newNode(yylineno, IF, yytext, 0); return IF;
 }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 104 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, ELSE, yytext); return ELSE;
+{ yylval.type_node = newNode(yylineno, ELSE, yytext, 0); return ELSE;
 } 
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 106 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, WHILE, yytext); return WHILE;
+{ yylval.type_node = newNode(yylineno, WHILE, yytext, 0); return WHILE;
 }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 108 "./lexical.l"
-{ yylval.type_node = newNode(yylineno, ID, yytext); return ID;
+{ yylval.type_node = newNode(yylineno, ID, yytext, 0); return ID;
 }
 	YY_BREAK
 case 29:

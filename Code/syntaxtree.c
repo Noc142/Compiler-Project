@@ -5,10 +5,11 @@
 #include "syntaxtree.h"
 #include "syntax.tab.h"
 #include "scanner.h"
-struct ASTNode* newNode(int l, int t, char *text) {
+struct ASTNode* newNode(int l, int t, char *text, char empty) {
 	struct ASTNode *node = malloc(sizeof(struct ASTNode));
 	node->lineno = l;
 	node->type = t;
+	node->isEmpty = empty;
 	memset(node->val, '\0', sizeof(char)*BUFFER_LEN);
 	if (text != NULL)
 		strcpy(node->val, text);
@@ -18,20 +19,16 @@ struct ASTNode* newNode(int l, int t, char *text) {
 	node->child = NULL;
 	return node;
 }
+
 struct ASTNode *buildChildren(int num, ...) {
 	va_list ap;
 	va_start(ap, num);
 	int i = 1;
 	struct ASTNode *ret = va_arg(ap, struct ASTNode*);
-	while (ret == NULL && i < num) {
-		ret = va_arg(ap, struct ASTNode*);
-		++i;
-	}
 	struct ASTNode *cur = ret;
 	for ( ; i < num; ++i) {
 		cur->next = va_arg(ap, struct ASTNode*);
-		if (cur->next != NULL)
-			cur = cur->next;
+		cur = cur->next;
 	}
 	va_end(ap);
 	return ret;
@@ -94,8 +91,10 @@ void output(struct ASTNode *root) {
 void preOrderShow(struct ASTNode *root, int depth) {
 	//printf("one call");
 	if (root != NULL) {
-		for (int i = 0; i < depth; ++i) printf("  ");
-		output(root);
+		if (!root->isEmpty) {
+			for (int i = 0; i < depth; ++i) printf("  ");
+			output(root);
+		}
 		preOrderShow(root->child, depth + 1);
 		preOrderShow(root->next, depth);
 	}

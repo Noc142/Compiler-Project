@@ -50,102 +50,102 @@
 
 %%
 /*High-level Definitions*/
-Program : ExtDefList { $$ = newNode(@$.first_line, Program, NULL); insertChildren($$, buildChildren(1, $1)); treeroot = $$; }
+Program : ExtDefList { $$ = newNode(@$.first_line, Program, NULL, 0); insertChildren($$, buildChildren(1, $1)); treeroot = $$; }
 	;
-ExtDefList : ExtDef ExtDefList { $$ = newNode(@$.first_line, ExtDefList, NULL); insertChildren($$, buildChildren(2, $1, $2));}
-	| /*empty*/ { $$ = NULL; }
+ExtDefList : ExtDef ExtDefList { $$ = newNode(@$.first_line, ExtDefList, NULL, 0); insertChildren($$, buildChildren(2, $1, $2));}
+	| /*empty*/ { $$ = newNode(@$.first_line, ExtDefList, NULL, 1); }
 	;
-ExtDef : Specifier ExtDecList SEMI { $$ = newNode(@$.first_line, ExtDef, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
-	| Specifier SEMI { $$ = newNode(@$.first_line, ExtDef, NULL); insertChildren($$, buildChildren(2, $1, $2));}
-	| Specifier FunDec CompSt { $$ = newNode(@$.first_line, ExtDef, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
+ExtDef : Specifier ExtDecList SEMI { $$ = newNode(@$.first_line, ExtDef, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
+	| Specifier SEMI { $$ = newNode(@$.first_line, ExtDef, NULL, 0); insertChildren($$, buildChildren(2, $1, $2));}
+	| Specifier FunDec CompSt { $$ = newNode(@$.first_line, ExtDef, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| Specifier ExtDecList error { errorSyntax = 1; synerror("Missing \";\".");}	
 	| Specifier error { errorSyntax = 1; synerror("Missing \";\".");}
 	;
-ExtDecList : VarDec { $$ = newNode(@$.first_line, ExtDecList, NULL); insertChildren($$, buildChildren(1, $1));}
-	| VarDec COMMA ExtDecList { $$ = newNode(@$.first_line, ExtDecList, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}	
+ExtDecList : VarDec { $$ = newNode(@$.first_line, ExtDecList, NULL, 0); insertChildren($$, buildChildren(1, $1));}
+	| VarDec COMMA ExtDecList { $$ = newNode(@$.first_line, ExtDecList, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}	
 	;
 
 /*Specifiers*/
-Specifier : TYPE { $$ = newNode(@$.first_line, Specifier, NULL); insertChildren($$, buildChildren(1, $1));}
-	| StructSpecifier { $$ = newNode(@$.first_line, Specifier, NULL); insertChildren($$, buildChildren(1, $1));}
+Specifier : TYPE { $$ = newNode(@$.first_line, Specifier, NULL, 0); insertChildren($$, buildChildren(1, $1));}
+	| StructSpecifier { $$ = newNode(@$.first_line, Specifier, NULL, 0); insertChildren($$, buildChildren(1, $1));}
 	;
-StructSpecifier : STRUCT OptTag LC DefList RC { $$ = newNode(@$.first_line, StructSpecifier, NULL); insertChildren($$, buildChildren(5, $1, $2, $3, $4, $5));}
-	| STRUCT Tag { $$ = newNode(@$.first_line, StructSpecifier, NULL); insertChildren($$, buildChildren(2, $1, $2));}
+StructSpecifier : STRUCT OptTag LC DefList RC { $$ = newNode(@$.first_line, StructSpecifier, NULL, 0); insertChildren($$, buildChildren(5, $1, $2, $3, $4, $5));}
+	| STRUCT Tag { $$ = newNode(@$.first_line, StructSpecifier, NULL, 0); insertChildren($$, buildChildren(2, $1, $2));}
 	;
-OptTag : ID { $$ = newNode(@$.first_line, OptTag, NULL); insertChildren($$, buildChildren(1, $1));}
-	| /*empty*/ { $$ = NULL;}
+OptTag : ID { $$ = newNode(@$.first_line, OptTag, NULL, 0); insertChildren($$, buildChildren(1, $1));}
+	| /*empty*/ { $$ = newNode(@$.first_line, OptTag, NULL, 1);}
 	;
-Tag : ID { $$ = newNode(@$.first_line, Tag, NULL); insertChildren($$, buildChildren(1, $1));}
+Tag : ID { $$ = newNode(@$.first_line, Tag, NULL, 0); insertChildren($$, buildChildren(1, $1));}
 	;
 
 /*Declarators*/
-VarDec : ID { $$ = newNode(@$.first_line, VarDec, NULL); insertChildren($$, buildChildren(1, $1));}
-	| VarDec LB INT RB { $$ = newNode(@$.first_line, VarDec, NULL); insertChildren($$, buildChildren(4, $1, $2, $3, $4));}
+VarDec : ID { $$ = newNode(@$.first_line, VarDec, NULL, 0); insertChildren($$, buildChildren(1, $1));}
+	| VarDec LB INT RB { $$ = newNode(@$.first_line, VarDec, NULL, 0); insertChildren($$, buildChildren(4, $1, $2, $3, $4));}
 	;
-FunDec : ID LP VarList RP { $$ = newNode(@$.first_line, FunDec, NULL); insertChildren($$, buildChildren(4, $1, $2, $3, $4));}
-	| ID LP RP { $$ = newNode(@$.first_line, FunDec, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
+FunDec : ID LP VarList RP { $$ = newNode(@$.first_line, FunDec, NULL, 0); insertChildren($$, buildChildren(4, $1, $2, $3, $4));}
+	| ID LP RP { $$ = newNode(@$.first_line, FunDec, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| ID LP VarList error RP { synerror("Missing \")\".");}		
 	| ID LP error RP { synerror("Wrong variable list.");}		
 	;
-VarList : ParamDec COMMA VarList { $$ = newNode(@$.first_line, VarList, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
-	| ParamDec { $$ = newNode(@$.first_line, VarList, NULL); insertChildren($$, buildChildren(1, $1));}
+VarList : ParamDec COMMA VarList { $$ = newNode(@$.first_line, VarList, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
+	| ParamDec { $$ = newNode(@$.first_line, VarList, NULL, 0); insertChildren($$, buildChildren(1, $1));}
 	;
-ParamDec : Specifier VarDec { $$ = newNode(@$.first_line, ParamDec, NULL); insertChildren($$, buildChildren(2, $1, $2));}
+ParamDec : Specifier VarDec { $$ = newNode(@$.first_line, ParamDec, NULL, 0); insertChildren($$, buildChildren(2, $1, $2));}
 	;
 
 
 /*Statements*/
-CompSt : LC DefList StmtList RC { $$ = newNode(@$.first_line, CompSt, NULL); insertChildren($$, buildChildren(4, $1, $2, $3, $4)); }
+CompSt : LC DefList StmtList RC { $$ = newNode(@$.first_line, CompSt, NULL, 0); insertChildren($$, buildChildren(4, $1, $2, $3, $4)); }
 	| LC DefList StmtList error { errorSyntax = 1; synerror("Missing \"}\".");}		
 	;
-StmtList : Stmt StmtList { $$ = newNode(@$.first_line, StmtList, NULL); insertChildren($$, buildChildren(2, $1, $2));}
-	| /*empty*/ { $$ = NULL;}
+StmtList : Stmt StmtList { $$ = newNode(@$.first_line, StmtList, NULL, 0); insertChildren($$, buildChildren(2, $1, $2));}
+	| /*empty*/ { $$ = newNode(@$.first_line, StmtList, NULL, 1);}
 	;
-Stmt : Exp SEMI { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, buildChildren(2, $1, $2));}
-	| CompSt { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, buildChildren(1, $1));}
-	| RETURN Exp SEMI { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
+Stmt : Exp SEMI { $$ = newNode(@$.first_line, Stmt, NULL, 0); insertChildren($$, buildChildren(2, $1, $2));}
+	| CompSt { $$ = newNode(@$.first_line, Stmt, NULL, 0); insertChildren($$, buildChildren(1, $1));}
+	| RETURN Exp SEMI { $$ = newNode(@$.first_line, Stmt, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| RETURN Exp error  { synerror("Missing \";\".");}	
-	| IF LP Exp RP Stmt %prec LOWER_THAN_ELSE { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, buildChildren(5, $1, $2, $3, $4, $5));}
-	| IF LP Exp RP Stmt ELSE Stmt { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, buildChildren(7, $1, $2, $3, $4, $5, $6, $7));}
-	| WHILE LP Exp RP Stmt { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, buildChildren(5, $1, $2, $3, $4, $5));}
+	| IF LP Exp RP Stmt %prec LOWER_THAN_ELSE { $$ = newNode(@$.first_line, Stmt, NULL, 0); insertChildren($$, buildChildren(5, $1, $2, $3, $4, $5));}
+	| IF LP Exp RP Stmt ELSE Stmt { $$ = newNode(@$.first_line, Stmt, NULL, 0); insertChildren($$, buildChildren(7, $1, $2, $3, $4, $5, $6, $7));}
+	| WHILE LP Exp RP Stmt { $$ = newNode(@$.first_line, Stmt, NULL, 0); insertChildren($$, buildChildren(5, $1, $2, $3, $4, $5));}
 	| Exp error { errorSyntax = 1; synerror("Missing \";\".");}		
 	;
 
 
 /*Local Definitions*/
-DefList : Def DefList { $$ = newNode(@$.first_line, DefList, NULL); insertChildren($$, buildChildren(2, $1, $2));}
-	| /*empty*/ {$$ = NULL;}
+DefList : Def DefList { $$ = newNode(@$.first_line, DefList, NULL, 0); insertChildren($$, buildChildren(2, $1, $2));}
+	| /*empty*/ {$$ = newNode(@$.first_line, DefList, NULL, 1);}
 	;
-Def : Specifier DecList SEMI { $$ = newNode(@$.first_line, Def, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
+Def : Specifier DecList SEMI { $$ = newNode(@$.first_line, Def, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| Specifier error SEMI 	{ errorSyntax = 1; synerror("Wrong defination.");}
-	| Specifier	DecList error { errorSyntax = 1; synerror("fuckMissing \";\".");}
+	| Specifier	DecList error { errorSyntax = 1; synerror("Missing \";\".");}
 	| error SEMI { errorSyntax = 1; synerror("Wrong defination."); }
 	;
-DecList : Dec { $$ = newNode(@$.first_line, DecList, NULL); insertChildren($$, buildChildren(1, $1));}
-	| Dec COMMA DecList { $$ = newNode(@$.first_line, DecList, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
+DecList : Dec { $$ = newNode(@$.first_line, DecList, NULL, 0); insertChildren($$, buildChildren(1, $1));}
+	| Dec COMMA DecList { $$ = newNode(@$.first_line, DecList, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	;
-Dec : VarDec { $$ = newNode(@$.first_line, Dec, NULL); insertChildren($$, buildChildren(1, $1));}
-	| VarDec ASSIGNOP Exp { $$ = newNode(@$.first_line, Dec, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
+Dec : VarDec { $$ = newNode(@$.first_line, Dec, NULL, 0); insertChildren($$, buildChildren(1, $1));}
+	| VarDec ASSIGNOP Exp { $$ = newNode(@$.first_line, Dec, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	;
 
 
 /*Expressions*/
-Exp : Exp ASSIGNOP Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
-	| Exp AND Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
-	| Exp OR Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
-	| Exp RELOP Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
-	| Exp PLUS Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
-	| Exp MINUS Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
-	| Exp STAR Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
-	| Exp DIV Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
-	| LP Exp RP { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
+Exp : Exp ASSIGNOP Exp { $$ = newNode(@$.first_line, Exp, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
+	| Exp AND Exp { $$ = newNode(@$.first_line, Exp, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
+	| Exp OR Exp { $$ = newNode(@$.first_line, Exp, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
+	| Exp RELOP Exp { $$ = newNode(@$.first_line, Exp, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
+	| Exp PLUS Exp { $$ = newNode(@$.first_line, Exp, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
+	| Exp MINUS Exp { $$ = newNode(@$.first_line, Exp, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
+	| Exp STAR Exp { $$ = newNode(@$.first_line, Exp, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
+	| Exp DIV Exp { $$ = newNode(@$.first_line, Exp, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
+	| LP Exp RP { $$ = newNode(@$.first_line, Exp, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| LP Exp error { errorSyntax = 1; synerror("Missing \")\".");}
-	| MINUS Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(2, $1, $2));}
-	| NOT Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(2, $1, $2));}
-	| ID LP Args RP { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(4, $1, $2, $3, $4));}
+	| MINUS Exp { $$ = newNode(@$.first_line, Exp, NULL, 0); insertChildren($$, buildChildren(2, $1, $2));}
+	| NOT Exp { $$ = newNode(@$.first_line, Exp, NULL, 0); insertChildren($$, buildChildren(2, $1, $2));}
+	| ID LP Args RP { $$ = newNode(@$.first_line, Exp, NULL, 0); insertChildren($$, buildChildren(4, $1, $2, $3, $4));}
 	| ID LP Args error { synerror("Missing \")\"."); }
-	| ID LP RP { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
-	| Exp LB Exp RB { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(4, $1, $2, $3, $4));}
+	| ID LP RP { $$ = newNode(@$.first_line, Exp, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
+	| Exp LB Exp RB { $$ = newNode(@$.first_line, Exp, NULL, 0); insertChildren($$, buildChildren(4, $1, $2, $3, $4));}
 	| Exp LB error RB { errorSyntax = 1; synerror("Wrong expression in \"[]\".");}
 	| Exp LB Exp error RB { errorSyntax = 1; synerror("Missing \"]\".");}
 	| Exp ASSIGNOP error { errorSyntax = 1; synerror("Wrong \"=\" expression.");}
@@ -156,13 +156,13 @@ Exp : Exp ASSIGNOP Exp { $$ = newNode(@$.first_line, Exp, NULL); insertChildren(
 	| Exp MINUS error { errorSyntax = 1; synerror("Wrong \"-\" expression.");}
 	| Exp STAR error { errorSyntax = 1; synerror("Wrong \"*\" expression.");}
 	| Exp DIV error { errorSyntax = 1; synerror("Wrong \"/\" expression.");}
-	| Exp DOT ID { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
-	| ID { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(1, $1));}
-	| INT { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(1, $1));}
-	| FLOAT { $$ = newNode(@$.first_line, Exp, NULL); insertChildren($$, buildChildren(1, $1));}
+	| Exp DOT ID { $$ = newNode(@$.first_line, Exp, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
+	| ID { $$ = newNode(@$.first_line, Exp, NULL, 0); insertChildren($$, buildChildren(1, $1));}
+	| INT { $$ = newNode(@$.first_line, Exp, NULL, 0); insertChildren($$, buildChildren(1, $1));}
+	| FLOAT { $$ = newNode(@$.first_line, Exp, NULL, 0); insertChildren($$, buildChildren(1, $1));}
 	;
-Args : Exp COMMA Args { $$ = newNode(@$.first_line, Args, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
-	| Exp { $$ = newNode(@$.first_line, Args, NULL); insertChildren($$, buildChildren(1, $1));}
+Args : Exp COMMA Args { $$ = newNode(@$.first_line, Args, NULL, 0); insertChildren($$, buildChildren(3, $1, $2, $3));}
+	| Exp { $$ = newNode(@$.first_line, Args, NULL, 0); insertChildren($$, buildChildren(1, $1));}
 	| Exp error Args {synerror("Missing comma ',' between args.");}	
 	;
 
