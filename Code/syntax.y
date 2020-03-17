@@ -185,7 +185,6 @@ int main(int argc, char **argv) {
 	}
 	//yydebug = 1;
 	yyparse();
-	printf("parse over\n");
 	if (errorLexical) fprintf(stderr, "Lexical errors exist!\n");
 	if (errorSyntax) fprintf(stderr, "Syntax errors exist!\n");
 	if (errorLexical || errorSyntax) return 0;
