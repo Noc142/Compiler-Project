@@ -1,9 +1,4 @@
-int main()
-{
-	/*
-	comment
-	/*
-	nested comment
-	*/
-	int i = 2;
-
+int main({
+	/**/
+	int a
+}

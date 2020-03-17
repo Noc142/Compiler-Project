@@ -63,6 +63,7 @@ ExtDef : Specifier ExtDecList SEMI { $$ = newNode(@$.first_line, ExtDef, NULL); 
 	;
 ExtDecList : VarDec { $$ = newNode(@$.first_line, ExtDecList, NULL); insertChildren($$, buildChildren(1, $1));}
 	| VarDec COMMA ExtDecList { $$ = newNode(@$.first_line, ExtDecList, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}	
+	| error CompSt {synerror("Missing something before \"{\".");}
 	;
 
 /*Specifiers*/
@@ -71,6 +72,7 @@ Specifier : TYPE { $$ = newNode(@$.first_line, Specifier, NULL); insertChildren(
 	;
 StructSpecifier : STRUCT OptTag LC DefList RC { $$ = newNode(@$.first_line, StructSpecifier, NULL); insertChildren($$, buildChildren(5, $1, $2, $3, $4, $5));}
 	| STRUCT Tag { $$ = newNode(@$.first_line, StructSpecifier, NULL); insertChildren($$, buildChildren(2, $1, $2));}
+	| STRUCT error LC DefList RC {synerror("Wrong struct.");}
 	;
 OptTag : ID { $$ = newNode(@$.first_line, OptTag, NULL); insertChildren($$, buildChildren(1, $1));}
 	| /*empty*/ { $$ = NULL;}
@@ -84,11 +86,12 @@ VarDec : ID { $$ = newNode(@$.first_line, VarDec, NULL); insertChildren($$, buil
 	;
 FunDec : ID LP VarList RP { $$ = newNode(@$.first_line, FunDec, NULL); insertChildren($$, buildChildren(4, $1, $2, $3, $4));}
 	| ID LP RP { $$ = newNode(@$.first_line, FunDec, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
-	| ID LP VarList error RP { synerror("Missing \")\".");}		
-	| ID LP error RP { synerror("Wrong variable list.");}		
+	| ID LP VarList error { synerror("Missing \")\".");}		
+	| ID LP error { synerror("Missing \")\".");}		
 	;
 VarList : ParamDec COMMA VarList { $$ = newNode(@$.first_line, VarList, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| ParamDec { $$ = newNode(@$.first_line, VarList, NULL); insertChildren($$, buildChildren(1, $1));}
+	| ParamDec error VarList { synerror("Missing \",\".");}
 	;
 ParamDec : Specifier VarDec { $$ = newNode(@$.first_line, ParamDec, NULL); insertChildren($$, buildChildren(2, $1, $2));}
 	;
@@ -108,7 +111,8 @@ Stmt : Exp SEMI { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, bu
 	| IF LP Exp RP Stmt %prec LOWER_THAN_ELSE { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, buildChildren(5, $1, $2, $3, $4, $5));}
 	| IF LP Exp RP Stmt ELSE Stmt { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, buildChildren(7, $1, $2, $3, $4, $5, $6, $7));}
 	| WHILE LP Exp RP Stmt { $$ = newNode(@$.first_line, Stmt, NULL); insertChildren($$, buildChildren(5, $1, $2, $3, $4, $5));}
-	| Exp error { errorSyntax = 1; synerror("Missing \";\".");}		
+	| Exp error { errorSyntax = 1; synerror("Missing \";\".");}
+	| error SEMI { synerror("Missing statement before \";\".");}		
 	;
 
 
@@ -118,7 +122,7 @@ DefList : Def DefList { $$ = newNode(@$.first_line, DefList, NULL); insertChildr
 	;
 Def : Specifier DecList SEMI { $$ = newNode(@$.first_line, Def, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| Specifier error SEMI 	{ errorSyntax = 1; synerror("Wrong defination.");}
-	| Specifier	DecList error { errorSyntax = 1; synerror("fuckMissing \";\".");}
+	| Specifier	DecList error { errorSyntax = 1; synerror("Missing \";\".");}
 	| error SEMI { errorSyntax = 1; synerror("Wrong defination."); }
 	;
 DecList : Dec { $$ = newNode(@$.first_line, DecList, NULL); insertChildren($$, buildChildren(1, $1));}
