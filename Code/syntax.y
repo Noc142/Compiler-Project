@@ -53,7 +53,7 @@
 Program : ExtDefList { $$ = newNode(@$.first_line, Program, NULL); insertChildren($$, buildChildren(1, $1)); treeroot = $$; }
 	;
 ExtDefList : ExtDef ExtDefList { $$ = newNode(@$.first_line, ExtDefList, NULL); insertChildren($$, buildChildren(2, $1, $2));}
-	| /*empty*/ { $$ = NULL; }
+	| /*empty*/ { $$ = NULL; @$.first_line = yylineno;}
 	;
 ExtDef : Specifier ExtDecList SEMI { $$ = newNode(@$.first_line, ExtDef, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| Specifier SEMI { $$ = newNode(@$.first_line, ExtDef, NULL); insertChildren($$, buildChildren(2, $1, $2));}
