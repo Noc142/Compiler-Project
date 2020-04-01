@@ -5,9 +5,9 @@
 	#include "scanner.h"
 	#include "lex.yy.c"
 	//#define YYDEBUG 1
-	struct ASTNode *treeroot;
+	extern struct ASTNode *treeroot;
 	extern int errorLexical;
-	int errorSyntax = 0;
+	extern int errorSyntax;
 	extern int yyerror(char*);
 	extern int synerror(char *);
 %}
@@ -58,6 +58,7 @@ ExtDefList : ExtDef ExtDefList { $$ = newNode(@$.first_line, ExtDefList, NULL); 
 ExtDef : Specifier ExtDecList SEMI { $$ = newNode(@$.first_line, ExtDef, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| Specifier SEMI { $$ = newNode(@$.first_line, ExtDef, NULL); insertChildren($$, buildChildren(2, $1, $2));}
 	| Specifier FunDec CompSt { $$ = newNode(@$.first_line, ExtDef, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
+	| Specifier FunDec SEMI { $$ = newNode(@$.first_line, ExtDef, NULL); insertChildren($$, buildChildren(3, $1, $2, $3));}
 	| Specifier ExtDecList error { errorSyntax = 1; synerror("Missing \";\".");}	
 	| Specifier error { errorSyntax = 1; synerror("Missing \";\".");}
 	;
@@ -171,27 +172,6 @@ Args : Exp COMMA Args { $$ = newNode(@$.first_line, Args, NULL); insertChildren(
 	;
 
 %%
-int main(int argc, char **argv) {
-	if (argc == 1) {
-
-	}
-	else {
-		FILE *fp = fopen(argv[1], "r");
-		if (fp == NULL) {
-			printf("File %s does not exist!\n", argv[1]);
-			return -1;
-		}
-		yyrestart(fp);
-	}
-	//yydebug = 1;
-	yyparse();
-	if (errorLexical) fprintf(stderr, "Lexical errors exist!\n");
-	if (errorSyntax) fprintf(stderr, "Syntax errors exist!\n");
-	if (errorLexical || errorSyntax) return 0;
-	preOrderShow(treeroot, 0);
-	deleteTree(treeroot);
-	return 0;
-}
 int yyerror(char* msg) {
 	errorSyntax = 1;
 	//fprintf(stderr, "Error type B at Line %d: %s\n",yylineno,msg);

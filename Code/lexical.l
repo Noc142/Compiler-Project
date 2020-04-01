@@ -3,7 +3,7 @@
 	#include "stdio.h"
 	//#include "syntaxtree.h"
 	int yycolumn = 1;
-	int errorLexical = 0;
+	extern int errorLexical;
 	#define YY_USER_ACTION \
 		yylloc.first_line = yylloc.last_line = yylineno; \
 		yylloc.first_column = yycolumn; \
@@ -46,6 +46,8 @@ IF if
 ELSE else
 WHILE while
 LINEANNO \/\/.*
+BLOCKANNO \/\*([^\*]*\**|([^\*]*\*+[^\/][^\*]*)+)\*\/
+BADBLOCKANNO \/\*[.\n]*
 ERRORFLOAT {DIGIT}{DOT}{DIGIT}*{LETTER_}+[{DIGIT}{LETTER_}]*
 ERRORINT {DIGIT}+{LETTER_}+[{DIGIT}{LETTER_}]*
 %%
@@ -110,10 +112,15 @@ return FLOAT;
 {ERRORFLOAT} {errorLexical = 1;fprintf(stderr, "Error type A at Line %d: Illegal floating number \"%s\".\n", yylineno, yytext);}
 {ERRORINT} {errorLexical = 1;fprintf(stderr, "Error type A at Line %d: Illegal integral number \"%s\".\n", yylineno, yytext);}
 {LINEANNO} {}
+{BLOCKANNO} {}
+{BADBLOCKANNO} {
+	fprintf(stderr, "Error type A at Line %d: Unterminated Comment\n", yylineno);
+	errorLexical = 1;
+}
 "/*" { 
-	int flag = 0;
+	/*int flag = 0;
 	char c = input(); 
-	while (c != 0) {
+	while (c != EOF) {
 		if (c == '*') {
 			c = input();
 			if (c == '/') {
@@ -123,10 +130,9 @@ return FLOAT;
 		}
 		c = input();
 	}
-	if (flag == 0) {
-		fprintf(stderr, "Error type A at Line %d: Unterminated Comment\n", yylineno);
-		errorLexical = 1;
-	}
+	if (flag == 0) {*/
+	fprintf(stderr, "Error type A at Line %d: Unterminated Comment\n", yylineno);
+	errorLexical = 1;
 }
 . {  errorLexical = 1;fprintf(stderr, "Error type A at Line %d: Mysterious characters\'%s\'\n", yylineno, yytext);}
 \n { yycolumn = 1; 
