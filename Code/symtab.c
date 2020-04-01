@@ -1,4 +1,4 @@
-#include "bstree.h"
+#include "symtab.h"
 #include <string.h>
 #include <memory.h>
 #include <stdio.h>
@@ -56,7 +56,7 @@ int HashContains(struct HashTable table, char k[]) {
 	for (int i = 0; i < lenk; ++i) {
 		code *= 65599 * code + (unsigned int)k[i];
 	}
-	code = sum % DEFAULT_HASH_SIZE;
+	code %= DEFAULT_HASH_SIZE;
 	return Contains(table.table[code], k);
 }
 int HashInsert(struct HashTable table, char k[], int tp) {
@@ -65,6 +65,6 @@ int HashInsert(struct HashTable table, char k[], int tp) {
 	for (int i = 0; i < lenk; ++i) {
 		code *= 65599 * code + (unsigned int)k[i];
 	}
-	code = sum % DEFAULT_HASH_SIZE;
+	code %= DEFAULT_HASH_SIZE;
 	return Insert(table.table[code], k, tp);
 }

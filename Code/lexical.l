@@ -53,61 +53,61 @@ ERRORINT {DIGIT}+{LETTER_}+[{DIGIT}{LETTER_}]*
 %%
 {WS} {}
 {FLOAT} {  
-	yylval.type_node = newNode(yylineno, FLOAT, yytext); 
+	yylval.type_node = newNode_t(yylineno, FLOAT, yytext); 
 return FLOAT;
 
 }
-{INT} {  yylval.type_node = newNode(yylineno, INT, yytext); return INT;
+{INT} {  yylval.type_node = newNode_t(yylineno, INT, yytext); return INT;
 }
-{SEMI} { yylval.type_node = newNode(yylineno, SEMI, yytext); return SEMI;
+{SEMI} { yylval.type_node = newNode_t(yylineno, SEMI, yytext); return SEMI;
 }
-{COMMA} { yylval.type_node = newNode(yylineno, COMMA, yytext); return COMMA;
+{COMMA} { yylval.type_node = newNode_t(yylineno, COMMA, yytext); return COMMA;
 }
-{ASSIGNOP} { yylval.type_node = newNode(yylineno, ASSIGNOP, yytext);return ASSIGNOP;
+{ASSIGNOP} { yylval.type_node = newNode_t(yylineno, ASSIGNOP, yytext);return ASSIGNOP;
 }
-{RELOP} { yylval.type_node = newNode(yylineno, RELOP, yytext); return RELOP;
+{RELOP} { yylval.type_node = newNode_t(yylineno, RELOP, yytext); return RELOP;
 }
-{PLUS} { yylval.type_node = newNode(yylineno, PLUS, yytext); return PLUS;
+{PLUS} { yylval.type_node = newNode_t(yylineno, PLUS, yytext); return PLUS;
 }
-{MINUS} { yylval.type_node = newNode(yylineno, MINUS, yytext); return MINUS;
+{MINUS} { yylval.type_node = newNode_t(yylineno, MINUS, yytext); return MINUS;
 }
-{STAR} { yylval.type_node = newNode(yylineno, STAR, yytext); return STAR;
+{STAR} { yylval.type_node = newNode_t(yylineno, STAR, yytext); return STAR;
 }
-{DIV} { yylval.type_node = newNode(yylineno, DIV, yytext); return DIV;
+{DIV} { yylval.type_node = newNode_t(yylineno, DIV, yytext); return DIV;
 }
-{AND} { yylval.type_node = newNode(yylineno, AND, yytext); return AND;
+{AND} { yylval.type_node = newNode_t(yylineno, AND, yytext); return AND;
 }
-{OR} { yylval.type_node = newNode(yylineno, OR, yytext); return OR;
+{OR} { yylval.type_node = newNode_t(yylineno, OR, yytext); return OR;
 }
-{DOT} { yylval.type_node = newNode(yylineno, DOT, yytext); return DOT;
+{DOT} { yylval.type_node = newNode_t(yylineno, DOT, yytext); return DOT;
 }
-{NOT} { yylval.type_node = newNode(yylineno, NOT, yytext); return NOT;
+{NOT} { yylval.type_node = newNode_t(yylineno, NOT, yytext); return NOT;
 }
-{TYPE} { yylval.type_node = newNode(yylineno, TYPE, yytext); return TYPE;
+{TYPE} { yylval.type_node = newNode_t(yylineno, TYPE, yytext); return TYPE;
 }
-{LP} { yylval.type_node = newNode(yylineno, LP, yytext); return LP;
+{LP} { yylval.type_node = newNode_t(yylineno, LP, yytext); return LP;
 }
-{RP} { yylval.type_node = newNode(yylineno, RP, yytext); return RP;
+{RP} { yylval.type_node = newNode_t(yylineno, RP, yytext); return RP;
 }
-{LB} { yylval.type_node = newNode(yylineno, LB, yytext); return LB;
+{LB} { yylval.type_node = newNode_t(yylineno, LB, yytext); return LB;
 }
-{RB} { yylval.type_node = newNode(yylineno, RB, yytext); return RB;
+{RB} { yylval.type_node = newNode_t(yylineno, RB, yytext); return RB;
 }
-{LC} { yylval.type_node = newNode(yylineno, LC, yytext); return LC;
+{LC} { yylval.type_node = newNode_t(yylineno, LC, yytext); return LC;
 }
-{RC} { yylval.type_node = newNode(yylineno, RC, yytext); return RC;
+{RC} { yylval.type_node = newNode_t(yylineno, RC, yytext); return RC;
 }
-{STRUCT} { yylval.type_node = newNode(yylineno, STRUCT, yytext); return STRUCT;
+{STRUCT} { yylval.type_node = newNode_t(yylineno, STRUCT, yytext); return STRUCT;
 }
-{RETURN} { yylval.type_node = newNode(yylineno, RETURN, yytext); return RETURN;
+{RETURN} { yylval.type_node = newNode_t(yylineno, RETURN, yytext); return RETURN;
 }
-{IF} { yylval.type_node = newNode(yylineno, IF, yytext); return IF;
+{IF} { yylval.type_node = newNode_t(yylineno, IF, yytext); return IF;
 }
-{ELSE} { yylval.type_node = newNode(yylineno, ELSE, yytext); return ELSE;
+{ELSE} { yylval.type_node = newNode_t(yylineno, ELSE, yytext); return ELSE;
 } 
-{WHILE}  { yylval.type_node = newNode(yylineno, WHILE, yytext); return WHILE;
+{WHILE}  { yylval.type_node = newNode_t(yylineno, WHILE, yytext); return WHILE;
 }
-{ID} { yylval.type_node = newNode(yylineno, ID, yytext); return ID;
+{ID} { yylval.type_node = newNode_t(yylineno, ID, yytext); return ID;
 }
 {ERRORFLOAT} {errorLexical = 1;fprintf(stderr, "Error type A at Line %d: Illegal floating number \"%s\".\n", yylineno, yytext);}
 {ERRORINT} {errorLexical = 1;fprintf(stderr, "Error type A at Line %d: Illegal integral number \"%s\".\n", yylineno, yytext);}
@@ -117,24 +117,7 @@ return FLOAT;
 	fprintf(stderr, "Error type A at Line %d: Unterminated Comment\n", yylineno);
 	errorLexical = 1;
 }
-"/*" { 
-	/*int flag = 0;
-	char c = input(); 
-	while (c != EOF) {
-		if (c == '*') {
-			c = input();
-			if (c == '/') {
-				flag = 1; break;
-			}
-			else unput(c);
-		}
-		c = input();
-	}
-	if (flag == 0) {*/
-	fprintf(stderr, "Error type A at Line %d: Unterminated Comment\n", yylineno);
-	errorLexical = 1;
-}
-. {  errorLexical = 1;fprintf(stderr, "Error type A at Line %d: Mysterious characters\'%s\'\n", yylineno, yytext);}
+. {  errorLexical = 1;fprintf(stderr, "Error type A at Line %d: Mysterious characters \"%s\".\n", yylineno, yytext);}
 \n { yycolumn = 1; 
 }
 %%
