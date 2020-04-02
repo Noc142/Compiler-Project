@@ -126,6 +126,7 @@ int SymContains(struct SymTable table, char k[]) {
 	if (BSTContains(table.table_var[code], k)) return 1;
 	else if (BSTContains(table.table_func[code], k)) return 2;
 	else if (BSTContains(table.table_struct[code], k)) return 3;
+	return 0;
 }
 int SymInsert_var(Symbol table[], char k[], Type tp) {
 	unsigned int code = hashcode(k);
