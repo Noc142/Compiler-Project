@@ -3,27 +3,62 @@
 
 #define DEFAULT_HASH_SIZE 512
 #define STRLEN 40
+#define _VAR 1
+#define _FUNC 2
+#define _STRUCT 3
+
+
+typedef struct Type_* Type;
+typedef struct FieldList_* FieldList;
+typedef struct FieldList_* Symbol;
+
+struct Type_
+{
+	enum { BASIC, ARRAY, STRUCTURE } kind;
+	union 
+	{
+		//basic type
+		int basic;
+		//array
+		struct { Type elem; int size; } array;
+		FieldList structure;
+	} u;
+};
+
+struct FieldList_
+{
+	int which; //Variable?Function?Struct?
+	char name[STRLEN];
+	Type type;
+	FieldList tail;
+	struct FieldList_ *left, *right; //used to build binary search tree
+};
+
+
 /*Binary Search Tree Node*/
-typedef struct BSTNode {
-	char key[STRLEN]; //variable's name
-	int type; //variable's type
-	struct BSTNode *left, *right;
-} BSTNode;
 
-typedef struct HashTable{
-	BSTNode *table[DEFAULT_HASH_SIZE];
-} HashTable, Symtab;
+typedef struct SymTable {
+	Symbol table_var[DEFAULT_HASH_SIZE];//var
+	Symbol table_func[DEFAULT_HASH_SIZE];//func
+	Symbol table_struct[DEFAULT_HASH_SIZE];//struct
+} SymTable;
 
-void initBSTNode(BSTNode *node, char k[], int tp, struct BSTNode *l, struct BSTNode *r);
-
+unsigned int hashcode(char k[]);
+Symbol newSymbol_var(char k[], Type tp);
+Symbol newSymbol_func(char k[], Type tp);
+Symbol newSymbol_struct(char k[], FieldList fl);
 /*Insert a symbol to this tree*/
-int Insert(BSTNode *ptr, char k[], int tp);
+int BSTInsert_var(Symbol ptr, char k[], Type tp);
+int BSTInsert_func(Symbol ptr, char k[], Type tp);
+int BSTInsert_struct(Symbol ptr, char k[], FieldList fl);
 /*Judge if Symbol k in the tree*/
-int Contains(BSTNode *ptr, char k[]);
-void delete_BST(BSTNode *ptr);
+int BSTContains(Symbol ptr, char k[]);
+void delete_BST(Symbol ptr);
 
-int HashContains(struct HashTable table, char k[]);
-int HashInsert(struct HashTable table, char k[], int tp);
+int SymContains(struct SymTable table, char k[]);
+int SymInsert_var(Symbol table[], char k[], Type tp);
+int SymInsert_func(Symbol table[], char k[], Type tp);
+int SymInsert_struct(Symbol table[], char k[], FieldList fl);
 
 
 #endif

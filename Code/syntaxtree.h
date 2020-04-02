@@ -23,5 +23,6 @@ extern void insertChildren(struct ASTNode *parent, struct ASTNode *child);
 extern void deleteTree(struct ASTNode *root);
 extern void output(struct ASTNode *node);
 extern void preOrderShow(struct ASTNode *root, int depth);
+extern void preOrderAnalyze(struct ASTNode *root);
 
 #endif
