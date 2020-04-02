@@ -14,12 +14,22 @@ Symbol newSymbol_var(char k[], Type tp) {
 	retsym->right = NULL;
 	return retsym;
 }
-Symbol newSymbol_func(char k[], Type tp) {
+Symbol newSymbol_struct_var(char k[], Type tp) {
+	Symbol retsym = malloc(sizeof(Symbol));
+	strcpy(retsym->name, k);
+	retsym->which = _STRUCT_VAR;
+	retsym->type = tp;
+	retsym->tail = NULL;
+	retsym->left = NULL;
+	retsym->right = NULL;
+	return retsym;
+}
+Symbol newSymbol_func(char k[], Type tp, FieldList fl) {
 	Symbol retsym = malloc(sizeof(Symbol));
 	strcpy(retsym->name, k);
 	retsym->which = _FUNC;
 	retsym->type = tp;
-	retsym->tail = NULL;
+	retsym->tail = fl;
 	retsym->left = NULL;
 	retsym->right = NULL;
 	return retsym;
@@ -55,10 +65,10 @@ int BSTInsert_var(Symbol ptr, char k[], Type tp) {
 	else p->right = cur;
 	return 1;
 }
-int BSTInsert_func(Symbol ptr, char k[], Type tp) {
+int BSTInsert_func(Symbol ptr, char k[], Type tp, FieldList fl) {
 	Symbol cur = NULL, p = NULL;
 	if (ptr == NULL) {
-		ptr = newSymbol_func(k, tp);
+		ptr = newSymbol_func(k, tp, fl);
 		return 1;
 	}
 	cur = ptr;
@@ -68,7 +78,7 @@ int BSTInsert_func(Symbol ptr, char k[], Type tp) {
 		else if (strcmp(k, cur->name) < 0) cur = cur->left;
 		else cur = cur->right;
 	}
-	cur = newSymbol_func(k, tp);
+	cur = newSymbol_func(k, tp, fl);
 	if (strcmp(k, p->name) < 0) {
 		p->left = cur;
 	}
@@ -126,15 +136,16 @@ int SymContains(struct SymTable table, char k[]) {
 	if (BSTContains(table.table_var[code], k)) return 1;
 	else if (BSTContains(table.table_func[code], k)) return 2;
 	else if (BSTContains(table.table_struct[code], k)) return 3;
+	else if (BSTContains(table.table_struct_var[code], k)) return 4;
 	return 0;
 }
 int SymInsert_var(Symbol table[], char k[], Type tp) {
 	unsigned int code = hashcode(k);
 	return BSTInsert_var(table[code], k, tp);
 }
-int SymInsert_func(Symbol table[], char k[], Type tp) {
+int SymInsert_func(Symbol table[], char k[], Type tp, FieldList fl) {
 	unsigned int code = hashcode(k);
-	return BSTInsert_func(table[code], k, tp);
+	return BSTInsert_func(table[code], k, tp, fl);
 }
 int SymInsert_struct(Symbol table[], char k[], FieldList fl) {
 	unsigned int code = hashcode(k);
