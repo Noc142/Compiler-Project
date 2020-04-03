@@ -30,11 +30,11 @@ struct FieldList_
 {
 	int which; //Variable?Function?Struct?
 	char name[STRLEN];
+	int isdefined;
 	Type type;
 	FieldList tail;
 	struct FieldList_ *left, *right; //used to build binary search tree
 };
-
 
 /*Binary Search Tree Node*/
 
@@ -45,23 +45,26 @@ typedef struct SymTable {
 	Symbol table_struct_var[DEFAULT_HASH_SIZE];//var in struct
 } SymTable;
 
+void initSymTable(SymTable *symtab);
 unsigned int hashcode(char k[]);
 Symbol newSymbol_var(char k[], Type tp);
 Symbol newSymbol_struct_var(char k[], Type tp);
-Symbol newSymbol_func(char k[], Type tp, FieldList fl);
+Symbol newSymbol_func(char k[], Type tp, FieldList fl, int isdef);
 Symbol newSymbol_struct(char k[], FieldList fl);
 /*Insert a symbol to this tree*/
-int BSTInsert_var(Symbol ptr, char k[], Type tp);
-int BSTInsert_func(Symbol ptr, char k[], Type tp, FieldList fl);
-int BSTInsert_struct(Symbol ptr, char k[], FieldList fl);
+int BSTInsert_var(Symbol *ptr, char k[], Type tp);
+int BSTInsert_func(Symbol *ptr, char k[], Type tp, FieldList fl, int isdef);
+int BSTInsert_struct(Symbol *ptr, char k[], FieldList fl);
 /*Judge if Symbol k in the tree*/
 int BSTContains(Symbol ptr, char k[]);
 void delete_BST(Symbol ptr);
 
-int SymContains(struct SymTable table, char k[]);
-int SymInsert_var(Symbol table[], char k[], Type tp);
-int SymInsert_func(Symbol table[], char k[], Type tp, FieldList fl);
-int SymInsert_struct(Symbol table[], char k[], FieldList fl);
+int SymContains(SymTable *symtab, char k[]);
+Symbol Find(Symbol table[], char k[]);
+int SymInsert_var(SymTable *symtab, char k[], Type tp);
+int SymInsert_func(SymTable *symtab, char k[], Type tp, FieldList fl, int isdef);
+int SymInsert_struct(SymTable *symtab, char k[], FieldList fl);
+int SymInsert_struct_var(SymTable *symtab, char k[], Type tp);
 
 
 #endif
