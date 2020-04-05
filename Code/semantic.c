@@ -21,6 +21,7 @@ enum nonterminal {
 };
 
 struct SymTable* symtable;
+int hidNameInt = 1;
 Type type_int;//for return type of int constant;
 Type type_float;
 int checkType(Type tp1, Type tp2)
@@ -166,6 +167,8 @@ void FunDec(Node* node, Type type,int isDefine)
 			if (SymContains(symtable, node->child->val) == 0)//not contain the declaration
 			{
 				SymInsert_func(symtable, node->child->val, type, field, isDefine,node->child->lineno);
+				//Symbol tmp = Find(symtable->table_func, node->child->val);
+				//fprintf(stderr, "Hello, %s, %s, %s, %d, %s\n", tmp->name, tmp->tail->name, tmp->tail->tail->name, tmp->tail->tail->type->kind, tmp->tail->tail->type->u.structure->name);
 			}
 			else {//contains,check whether the declaration is consistant
 				Symbol s = Find(symtable->table_func, node->child->val);
@@ -267,7 +270,7 @@ Type Exp(Node* node)
 		if (s == NULL) { fprintf(stderr, "Error type 11 at Line %d: \"%s\" is not a function.\n", node->child->lineno, node->child->val); return NULL; }
 		if (checkField(s->tail, Args(node->child->next->next)) == 0)
 		{
-			fprintf(stderr, "Error type 9 at Line %d: Function \"%s\" is not applicable for arguments that you write.\n", node->child->lineno, node->child->val);//change better if have time 
+			fprintf(stderr, "Error type 9 at Line %d: Function \"%s\" is not applicable for arguments that you write.\n", node->child->lineno, node->child->val); return NULL;//ange better if have time 
 		}
 		else return s->type;
 			}break;
@@ -275,8 +278,12 @@ Type Exp(Node* node)
 		if(SymContains(symtable,node->child->val)==0) { fprintf(stderr, "Error type 2 at Line %d: Undefined function \"%s\".\n", node->child->lineno, node->child->val); return NULL; }
 		Symbol s = Find(symtable->table_func, node->child->val);
 		if (s == NULL) { fprintf(stderr, "Error type 11 at Line %d: \"%s\" is not a function.\n", node->child->lineno, node->child->val); return NULL; }
+		if(s->tail!=NULL) {
+			fprintf(stderr, "Error type 9 at Line %d: Function \"%s\" is not applicable for arguments that you write.\n", node->child->lineno, node->child->val); return NULL;//ange better if have time 
+		}
 		else return s->type;
 			}break;
+
 		//*************************************************************************************************************************
 	case 14: {Type tp1 = Exp(node->child); Type tp2 = Exp(node->child->next->next); 
 		if (tp1->kind != ARRAY) { fprintf(stderr, "Error type 10 at Line %d: It is not an array.\n", node->child->lineno);/*output can be better*/ return NULL; }
@@ -288,8 +295,9 @@ Type Exp(Node* node)
 		break;
 		//*****************************************************************************************************************************
 	case 15: {Type tp1 = Exp(node->child); if (tp1->kind != STRUCTURE) { fprintf(stderr, "Error type 13 at Line %d: Illegal use of \".\".\n", node->child->lineno); return NULL; }
-		   if (Find(symtable->table_struct_var, node->child->next->next->val) == 0) { fprintf(stderr, "Error type 14 at Line %d: Non-existent field \"%s\".\n", node->child->next->next->lineno, node->child->next->next->val); return NULL; }
-			}break;
+		   Symbol s = Find(symtable->table_struct_var, node->child->next->next->val);
+			if ( s== NULL) { fprintf(stderr, "Error type 14 at Line %d: Non-existent field \"%s\".\n", node->child->next->next->lineno, node->child->next->next->val); return NULL; }
+		   else return s->type; }break;
 
 	case 16: {Symbol s1 = Find(symtable->table_var, node->child->val), s2 = Find(symtable->table_func_var, node->child->val);
 		if (s1 == NULL && s2 == NULL) { fprintf(stderr, "Error type 1 at Line %d: Undefined variable \"%s\".\n", node->child->lineno, node->child->val); return NULL; }
@@ -340,8 +348,10 @@ Type StructSpecifier(Node* node)
 		Type type = (Type)malloc(sizeof(struct Type_));
 		type->kind = STRUCTURE;
 		type->u.structure= (FieldList)malloc(sizeof(struct FieldList_));
-		if (node->child->next->child->isEmpty)
-			strcpy(type->u.structure->name,"\0");
+		if (node->child->next->isEmpty) {
+			sprintf(type->u.structure->name, "%d", hidNameInt);
+			hidNameInt++;
+		}
 		else strcpy(type->u.structure->name , node->child->next->child->val);
 		type->u.structure->tail = DefList(node->child->next->next->next,IN_STRUCT);
 		if (strcmp(type->u.structure->name,"\0")!= 0)
@@ -363,7 +373,7 @@ Type StructSpecifier(Node* node)
 		}
 		Type type= (Type)malloc(sizeof(struct Type_));
 		type->kind = STRUCTURE;
-		type->u.structure = sym->tail;
+		type->u.structure = sym;
 		return type;
 	}
 	
@@ -556,8 +566,8 @@ FieldList VarDec_CheckFuncDec(Node* node, Type type,int inwhere, int* hasFoundIn
 		if (node->npro == 1)//ID
 		{
 			FieldList retfl = Find(symtable->table_func_var, node->child->val);
-			if (retfl == NULL) *hasFoundInCons = 1;
-			else if (checkType(retfl->type, type) == 0) *hasFoundInCons = 1;
+			if (retfl == NULL) {*hasFoundInCons = 1; }
+			else if (checkType(retfl->type, type) == 0) {*hasFoundInCons = 1; }
 			return retfl;
 		}
 		else //VarDec LB INT RB//&&

@@ -1,10 +1,13 @@
-int func(int a);
-
-int func(int a)
+int func(int a, struct A {int c;}b);
+int func(int a, struct A b)
 {
 	return 1;
 }
 
 int main()
 {
+	struct {int dd;} fuck1, fuck2;
+	struct {int cds;} fuck3;
+	fuck1 = fuck2;
+	fuck2 = fuck3;
 }

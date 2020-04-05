@@ -1,0 +1,16 @@
+struct Position
+{ 
+	float x, y;
+}; 
+struct Position main(float a,int b,struct Position c)
+{
+
+}
+struct Position shit()
+{	
+	int gg;
+	struct Position bitch;
+	return main(bitch.x,gg,bitch);
+	
+}
+
