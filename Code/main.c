@@ -1,5 +1,6 @@
 #include "syntaxtree.h"
 #include <stdio.h>
+#include "semantic.h"
 
 int errorLexical = 0;
 int errorSyntax = 0;
@@ -24,7 +25,8 @@ int main(int argc, char **argv) {
 	if (errorLexical) fprintf(stderr, "Lexical errors exist!\n");
 	if (errorSyntax) fprintf(stderr, "Syntax errors exist!\n");
 	if (errorLexical || errorSyntax) return 0;
-	preOrderShow(treeroot, 0);
+	//preOrderShow(treeroot, 0);
+	Program(treeroot);
 	deleteTree(treeroot);
 	return 0;
 }

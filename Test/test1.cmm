@@ -1,5 +1,5 @@
-int main()
+int main() 
 {
-	int a[2+2];
+	int i = 0;
+	j = i + 1;
 }
-

@@ -9,6 +9,17 @@ void initSymTable(SymTable *symtab) {
 	memset(symtab->table_func, 0, DEFAULT_HASH_SIZE * sizeof(Symbol));
 	memset(symtab->table_struct, 0, DEFAULT_HASH_SIZE * sizeof(Symbol));
 	memset(symtab->table_struct_var, 0, DEFAULT_HASH_SIZE * sizeof(Symbol));
+	memset(symtab->table_func_var, 0, DEFAULT_HASH_SIZE * sizeof(Symbol));
+}
+
+void deleteSymTable(SymTable *symtab) {
+	for (int i = 0; i < DEFAULT_HASH_SIZE; ++i) {
+		delete_BST(symtab->table_var[i]);
+		delete_BST(symtab->table_func[i]);
+		delete_BST(symtab->table_struct_var[i]);
+		delete_BST(symtab->table_func_var[i]);
+		delete_BST(symtab->table_struct[i]);
+	}
 }
 
 Symbol newSymbol_var(char k[], Type tp) {
@@ -16,6 +27,7 @@ Symbol newSymbol_var(char k[], Type tp) {
 	strcpy(retsym->name, k);
 	retsym->which = _VAR;
 	retsym->isdefined = 1;
+	retsym->line=0;
 	retsym->type = tp;
 	retsym->tail = NULL;
 	retsym->left = NULL;
@@ -27,17 +39,19 @@ Symbol newSymbol_struct_var(char k[], Type tp) {
 	strcpy(retsym->name, k);
 	retsym->which = _STRUCT_VAR;
 	retsym->isdefined = 1;
+	retsym->line=0;
 	retsym->type = tp;
 	retsym->tail = NULL;
 	retsym->left = NULL;
 	retsym->right = NULL;
 	return retsym;
 }
-Symbol newSymbol_func(char k[], Type tp, FieldList fl, int isdef) {
+Symbol newSymbol_func(char k[], Type tp, FieldList fl, int isdef,int lineno) {
 	Symbol retsym = malloc(sizeof(struct FieldList_));
 	strcpy(retsym->name, k);
 	retsym->which = _FUNC;
 	retsym->isdefined = isdef;
+	retsym->line = lineno;
 	retsym->type = tp;
 	retsym->tail = fl;
 	retsym->left = NULL;
@@ -49,8 +63,21 @@ Symbol newSymbol_struct(char k[], FieldList fl) {
 	strcpy(retsym->name, k);
 	retsym->which = _STRUCT;
 	retsym->isdefined = 1;
+	retsym->line=0;
 	retsym->type = NULL;
 	retsym->tail = fl;
+	retsym->left = NULL;
+	retsym->right = NULL;
+	return retsym;
+}
+Symbol newSymbol_func_var(char k[], Type tp) {
+	Symbol retsym = malloc(sizeof(struct FieldList_));
+	strcpy(retsym->name, k);
+	retsym->which = _FUNC_VAR;
+	retsym->isdefined = 1;
+	retsym->line=0;
+	retsym->type = tp;
+	retsym->tail = NULL;
 	retsym->left = NULL;
 	retsym->right = NULL;
 	return retsym;
@@ -76,10 +103,10 @@ int BSTInsert_var(Symbol *ptr, char k[], Type tp) {
 	else p->right = cur;
 	return 1;
 }
-int BSTInsert_func(Symbol *ptr, char k[], Type tp, FieldList fl, int isdef) {
+int BSTInsert_func(Symbol *ptr, char k[], Type tp, FieldList fl, int isdef,int lineno) {
 	Symbol cur = NULL, p = NULL;
 	if (*ptr == NULL) {
-		*ptr = newSymbol_func(k, tp, fl, isdef);
+		*ptr = newSymbol_func(k, tp, fl, isdef,lineno);
 		return 1;
 	}
 	cur = *ptr;
@@ -89,7 +116,7 @@ int BSTInsert_func(Symbol *ptr, char k[], Type tp, FieldList fl, int isdef) {
 		else if (strcmp(k, cur->name) < 0) cur = cur->left;
 		else cur = cur->right;
 	}
-	cur = newSymbol_func(k, tp, fl, isdef);
+	cur = newSymbol_func(k, tp, fl, isdef,lineno);
 	if (strcmp(k, p->name) < 0) {
 		p->left = cur;
 	}
@@ -145,10 +172,11 @@ unsigned int hashcode(char k[]) {
 }
 int SymContains(struct SymTable *symtab, char k[]) {
 	unsigned int code = hashcode(k);
-	if (BSTContains(symtab->table_var[code], k)) return 1;
-	else if (BSTContains(symtab->table_func[code], k)) return 2;
-	else if (BSTContains(symtab->table_struct[code], k)) return 3;
-	else if (BSTContains(symtab->table_struct_var[code], k)) return 4;
+	if (BSTContains(symtab->table_var[code], k)) return _VAR;
+	else if (BSTContains(symtab->table_func[code], k)) return _FUNC;
+	else if (BSTContains(symtab->table_struct[code], k)) return _STRUCT;
+	else if (BSTContains(symtab->table_struct_var[code], k)) return _STRUCT_VAR;
+	else if (BSTContains(symtab->table_func_var[code], k)) return _FUNC_VAR;
 	return 0;
 }
 Symbol Find(Symbol table[], char k[]) {
@@ -166,20 +194,23 @@ int SymInsert_var(SymTable *symtab, char k[], Type tp) {
 	if (BSTContains(symtab->table_func[code], k)) return 0;
 	else if (BSTContains(symtab->table_struct[code], k)) return 0;
 	else if (BSTContains(symtab->table_struct_var[code], k)) return 0;
+	else if (BSTContains(symtab->table_func_var[code], k)) return 0;
 	return BSTInsert_var(&(symtab->table_var[code]), k, tp);
 }
-int SymInsert_func(SymTable *symtab, char k[], Type tp, FieldList fl, int isdef) {
+int SymInsert_func(SymTable *symtab, char k[], Type tp, FieldList fl, int isdef,int lineno) {
 	unsigned int code = hashcode(k);
 	if (BSTContains(symtab->table_var[code], k)) return 0;
 	else if (BSTContains(symtab->table_struct[code], k)) return 0;
 	else if (BSTContains(symtab->table_struct_var[code], k)) return 0;
-	return BSTInsert_func(&(symtab->table_func[code]), k, tp, fl, isdef);
+	else if (BSTContains(symtab->table_func_var[code], k)) return 0;
+	return BSTInsert_func(&(symtab->table_func[code]), k, tp, fl, isdef,lineno);
 }
 int SymInsert_struct(SymTable *symtab, char k[], FieldList fl) {
 	unsigned int code = hashcode(k);
 	if (BSTContains(symtab->table_var[code], k)) return 0;
 	else if (BSTContains(symtab->table_func[code], k)) return 0;
 	else if (BSTContains(symtab->table_struct_var[code], k)) return 0;
+	else if (BSTContains(symtab->table_func_var[code], k)) return 0;
 	return BSTInsert_struct(&(symtab->table_struct[code]), k, fl);
 }
 int SymInsert_struct_var(SymTable *symtab, char k[], Type tp) {
@@ -187,5 +218,14 @@ int SymInsert_struct_var(SymTable *symtab, char k[], Type tp) {
 	if (BSTContains(symtab->table_var[code], k)) return 0;
 	else if (BSTContains(symtab->table_func[code], k)) return 0;
 	else if (BSTContains(symtab->table_struct[code], k)) return 0;
+	else if (BSTContains(symtab->table_func_var[code], k)) return 0;
 	return BSTInsert_var(&(symtab->table_struct_var[code]), k, tp);
+}
+int SymInsert_func_var(SymTable *symtab, char k[], Type tp) {
+	unsigned int code = hashcode(k);
+	if (BSTContains(symtab->table_var[code], k)) return 0;
+	else if (BSTContains(symtab->table_func[code], k)) return 0;
+	else if (BSTContains(symtab->table_struct[code], k)) return 0;
+	else if (BSTContains(symtab->table_struct_var[code], k)) return 0;
+	return BSTInsert_var(&(symtab->table_func_var[code]), k, tp);
 }
