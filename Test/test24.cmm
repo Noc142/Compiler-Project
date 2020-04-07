@@ -10,6 +10,7 @@ struct Position shit()
 {	
 	int gg;
 	struct Position bitch;
+	bitch.x.z=1.0;
 	return main(bitch.x,gg,bitch);
 	
 }

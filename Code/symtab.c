@@ -229,3 +229,14 @@ int SymInsert_func_var(SymTable *symtab, char k[], Type tp) {
 	else if (BSTContains(symtab->table_struct_var[code], k)) return 0;
 	return BSTInsert_var(&(symtab->table_func_var[code]), k, tp);
 }
+void deleteType(Type node) {
+	if (node != NULL) {
+		deleteField(node->u.structure);
+	}
+}
+void deleteField(FieldList node) {
+	if (node != NULL) {
+		deleteType(node->type);
+		deleteField(node->tail);
+	}
+}

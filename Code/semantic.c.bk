@@ -22,7 +22,6 @@ enum nonterminal {
 
 struct SymTable* symtable;
 int hidNameInt = 1;
-int hidNameFunc = 1;
 Type type_int;//for return type of int constant;
 Type type_float;
 int checkType(Type tp1, Type tp2)
@@ -118,16 +117,22 @@ void FunDec(Node* node, Type type,int isDefine)
 			if(s!=NULL&&s->isdefined==1)
 				fprintf(stderr, "Error type 4 at Line %d: Redefined function: \"%s\".\n", node->child->lineno, node->child->val);
 			else if (s != NULL) {//check if this defination is consistant with the former declaration
+				int hasfault = 0;
 				if(node->npro==1) {
-					field = VarList(node->child->next->next);
+					field = VarList_CheckFuncDec(node->child->next->next, &hasfault);
+				}
+				if (hasfault) fprintf(stderr, "Error type 19 at Line %d: Inconsistent declaration and defination of function \"%s\".\n", node->child->lineno, node->child->val);
+				else if (node->npro == 2 && field != NULL) {
+					fprintf(stderr, "Error type 19 at Line %d: Inconsistent declaration and defination of function \"%s\".\n", node->child->lineno, node->child->val);
 				}
 				if (checkType(s->type, type) == 0 || checkField(s->tail, field) == 0)
 				{
-					
 					fprintf(stderr, "Error type 19 at Line %d: Inconsistent declaration and defination of function \"%s\".\n", node->child->lineno, node->child->val);
+					return;
 				}
-				s->isdefined = 1;
-				s->tail = field;
+				else {
+					s->isdefined = 1;
+				}
 			}
 			
 		}
@@ -144,31 +149,30 @@ void FunDec(Node* node, Type type,int isDefine)
 		{
 			Symbol s = Find(symtable->table_func, node->child->val);
 			if (s != NULL) {//check if this declaration is consistant with the former declaration or defination
-				FieldList field1 = NULL;
+				int hasfault = 0;
+				FieldList field1 = NULL, field2=NULL;
 				if(node->npro==1) {
-					field1 = VarList_CheckFuncDec(node->child->next->next);
+					field1 = VarList_CheckFuncDec(node->child->next->next, &hasfault);
 				}
-				if (checkType(s->type, type) == 0 || checkField(s->tail, field1) == 0)
+				if (hasfault) fprintf(stderr, "Error type 19 at Line %d: Inconsistent declaration and defination of function \"%s\".\n", node->child->lineno, node->child->val);
+				else if (node->npro == 2 && field1 != NULL) {
+					fprintf(stderr, "Error type 19 at Line %d: Inconsistent declaration and defination of function \"%s\".\n", node->child->lineno, node->child->val);
+				}
+				else if (checkType(s->type, type) == 0 || checkField(s->tail, field1) == 0)
 				{
 					fprintf(stderr, "Error type 19 at Line %d: Inconsistent declaration and defination of function \"%s\".\n", node->child->lineno, node->child->val);
 					return;
 				}
 			}
-			else {
-				if (node->npro == 1) {
-					VarList_CheckFuncDec(node->child->next->next);//just check the var's type if illegal, dont do other things.
-				}
-			fprintf(stderr, "Error type 4 at Line %d: Redefined function \"%s\".\n", node->child->lineno, node->child->val);
-			}
+			else fprintf(stderr, "Error type 4 at Line %d: Redefined function \"%s\".\n", node->child->lineno, node->child->val);
 			
 		}
 		else {
 			if(node->npro==1)
-				field = VarList_CheckFuncDec(node->child->next->next);
+				field = VarList(node->child->next->next);
 			if (SymContains(symtable, node->child->val) == 0)//not contain the declaration
 			{
 				SymInsert_func(symtable, node->child->val, type, field, isDefine,node->child->lineno);
-				//fprintf(stderr, "%s\n", field->name);
 				//Symbol tmp = Find(symtable->table_func, node->child->val);
 				//fprintf(stderr, "Hello, %s, %s, %s, %d, %s\n", tmp->name, tmp->tail->name, tmp->tail->tail->name, tmp->tail->tail->type->kind, tmp->tail->tail->type->u.structure->name);
 			}
@@ -305,12 +309,9 @@ Type Exp(Node* node)
 	}
 		break;
 		//*****************************************************************************************************************************
-	case 15: {Type tp1 = Exp(node->child); if (tp1 == NULL) return NULL; if (tp1->kind != STRUCTURE) { fprintf(stderr, "Error type 13 at Line %d: Illegal use of \".\".\n", node->child->lineno); return NULL; }
-		   if (fieldContain(tp1->u.structure, node->child->next->next->val) == 0) {fprintf(stderr, "Error type 14 at Line %d: Non-existent field \"%s\".\n", node->child->next->next->lineno, node->child->next->next->val); return NULL; };
-		   Symbol s = Find(symtable->table_struct_var, node->child->next->next->val);
-		   if (s == NULL) { fprintf(stderr, "Error type 14 at Line %d: Non-existent field \"%s\".\n", node->child->next->next->lineno, node->child->next->next->val); return NULL; }
-		   else return s->type; }break;
-
+	case 15: {Type tp1 = Exp(node->child); if (tp1->kind != STRUCTURE) { fprintf(stderr, "Error type 13 at Line %d: Illegal use of \".\".\n", node->child->lineno); return NULL; }
+		   if (Find(symtable->table_struct_var, node->child->next->next->val) == NULL) { fprintf(stderr, "Error type 14 at Line %d: Non-existent field \"%s\".\n", node->child->next->next->lineno, node->child->next->next->val); return NULL; }
+	}break;
 
 
 	case 16: {Symbol s1 = Find(symtable->table_var, node->child->val), s2 = Find(symtable->table_func_var, node->child->val);
@@ -371,7 +372,7 @@ Type StructSpecifier(Node* node)
 		}
 		else strcpy(type->u.structure->name , node->child->next->child->val);
 		type->u.structure->tail = DefList(node->child->next->next->next,IN_STRUCT);
-		if (!node->child->next->isEmpty)
+		if (strcmp(type->u.structure->name,"\0")!= 0)
 		{
 			if(SymContains(symtable, type->u.structure->name)!=0)
 				fprintf(stderr, "Error type 16 at Line %d: Duplicated name \"%s\".\n", node->child->next->lineno, type->u.structure->name);
@@ -473,15 +474,13 @@ FieldList DecList(Node* node, Type type, int inwhere)
 
 FieldList Dec(Node* node, Type type, int inwhere)
 {
-	
 	if (node->npro == 1)
 	{
 		return VarDec(node->child, type, inwhere);
 	}
 	else {
 		//VarDec ASSIGNOP Exp 
-		if(inwhere==IN_STRUCT)
-			fprintf(stderr, "Error type 15 at Line %d:initializing in struct defination is not allowed.\n", node->child->lineno);
+
 		//fprintf(stderr, "FUCKYOU");
 		FieldList fl1 = VarDec(node->child, type, inwhere);
 		Type tp2 = Exp(node->child->next->next);
@@ -492,7 +491,6 @@ FieldList Dec(Node* node, Type type, int inwhere)
 		return fl1;
 	}
 }
-
 
 FieldList VarDec(Node* node, Type type,int inwhere)
 {
@@ -563,56 +561,52 @@ FieldList VarDec(Node* node, Type type,int inwhere)
 	}
 }
 
-FieldList VarList_CheckFuncDec(Node* node)
+FieldList VarList_CheckFuncDec(Node* node, int* hasFoundInCons)
 {
 	FieldList result = NULL;
 	if (node->npro == 2)
 	{
-		result = ParamDec_CheckFuncDec(node->child);
+		result = ParamDec_CheckFuncDec(node->child, hasFoundInCons);
 	}
 	else {
-		result = ParamDec_CheckFuncDec(node->child);
+		result = ParamDec_CheckFuncDec(node->child, hasFoundInCons);
 		if(result!=NULL)
-			result->tail = VarList_CheckFuncDec(node->child->next->next);
+			result->tail = VarList_CheckFuncDec(node->child->next->next, hasFoundInCons);
 	}
 	return result;
 }
 
-FieldList ParamDec_CheckFuncDec(Node* node)
+FieldList ParamDec_CheckFuncDec(Node* node, int* hasFoundInCons)
 {
 	Type type=Specifier(node->child);
-	return VarDec_CheckFuncDec(node->child->next, type, IN_PARAM);
+	return VarDec_CheckFuncDec(node->child->next, type, IN_PARAM, hasFoundInCons);
 }
-FieldList VarDec_CheckFuncDec(Node* node, Type type,int inwhere)
+FieldList VarDec_CheckFuncDec(Node* node, Type type,int inwhere, int* hasFoundInCons)
 {
 	if (inwhere == IN_PARAM)
 	{
 		if (node->npro == 1)//ID
 		{
-			/*char tmp[48] = "\0";
-			sprintf(tmp, "%d", hidNameFunc);
-			hidNameFunc++;
-			strcpy(tmp+strlen(tmp), node->child->val);*/
-			//fprintf(stderr, "SAD");
-			Symbol newNode = newSymbol_func_var(node->child->val, type);
-			return newNode;
+			FieldList retfl = Find(symtable->table_func_var, node->child->val);
+			if (retfl == NULL) {
+				if (SymInsert_var(symtable, node->child->val, type) == 0)//insert failed
+				{
+					fprintf(stderr, "Error type 3 at Line %d: Redefined variable \"%s\".\n", node->child->lineno, node->child->val);
+					return NULL;
+				}
+				else {
+					return (FieldList)Find(symtable->table_var, node->child->val);
+				}
+			}
+			if (retfl != NULL && checkType(retfl->type, type) == 0) {*hasFoundInCons = 1; }
+			return retfl;
 		}
 		else //VarDec LB INT RB//&&
 		{
 			Type ntp=  (Type)malloc(sizeof(struct Type_));
 			ntp->kind = ARRAY;
 			ntp->u.array.elem = type; ntp->u.array.size = atoi(node->child->next->next->val);		
-			return VarDec_CheckFuncDec(node->child, ntp, inwhere);
+			return VarDec_CheckFuncDec(node->child, ntp, inwhere, hasFoundInCons);
 		}
 	}
 }
-int fieldContain(FieldList fl, const char* name)
-{
-	if (fl == NULL) return 0;
-	
-	if (strcmp(fl->name, name) == 0) { return 1; }
-	else return fieldContain(fl->tail, name);
-}
-
-
-

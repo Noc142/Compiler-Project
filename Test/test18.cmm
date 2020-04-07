@@ -1,13 +1,8 @@
-int func(int a, struct A {int c;}b);
-int func(int a, struct A b)
-{
-	return 1;
-}
+int func(int a[20][10]);
+int func(int a[20][10], int b);
+int func(int v[10][20]){}
 
-int main()
-{
-	struct {int dd;} fuck1, fuck2;
-	struct {int cds;} fuck3;
-	fuck1 = fuck2;
-	fuck2 = fuck3;
+int main() {
+	int l[10][10];
+	func(l);
 }

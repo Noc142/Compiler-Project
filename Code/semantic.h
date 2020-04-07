@@ -23,6 +23,8 @@ void StmtList(Node* node, Type type);
 void Stmt(Node* node, Type type);
 Type Exp(Node* node);
 FieldList Args(Node* node);
-FieldList VarList_CheckFuncDec(Node* node, int* hasFoundInCons);
-FieldList ParamDec_CheckFuncDec(Node* node, int* hasFoundInCons);
-FieldList VarDec_CheckFuncDec(Node* node, Type type,int inwhere, int* hasFoundInCons);
+FieldList VarList_CheckFuncDec(Node* node);
+FieldList ParamDec_CheckFuncDec(Node* node);
+FieldList VarDec_CheckFuncDec(Node* node, Type type,int inwhere);
+int fieldContain(FieldList fl,const char*name);
+

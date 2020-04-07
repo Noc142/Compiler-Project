@@ -48,6 +48,8 @@ typedef struct SymTable {
 	Symbol table_func_var[DEFAULT_HASH_SIZE];
 } SymTable;
 
+void deleteType(Type node);
+void deleteField(FieldList node);
 void initSymTable(SymTable *symtab);
 unsigned int hashcode(char k[]);
 Symbol newSymbol_var(char k[], Type tp);
