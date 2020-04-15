@@ -98,6 +98,9 @@ void ExtDefList(Node* node)
 void ExtDef(Node* node)
 {
 	//fprintf(stderr, "ExtDef: %d\n", node->npro);
+	if (node->npro == 2 && ((node->child->npro == 1) || (node->child->npro == 2 && node->child->child->npro == 2))) {
+		return;
+	}
 	Type type = Specifier(node->child);
 	switch (node->npro) {
 		case 1:ExtDecList(node->child->next,type); break;
@@ -280,7 +283,8 @@ Type Exp(Node* node)
 		if (s == NULL) { fprintf(stderr, "Error type 11 at Line %d: \"%s\" is not a function.\n", node->child->lineno, node->child->val); return NULL; }
 		if (checkField(s->tail, Args(node->child->next->next)) == 0)
 		{
-			fprintf(stderr, "Error type 9 at Line %d: Function \"%s\" is not applicable for arguments that you write.\n", node->child->lineno, node->child->val); return NULL;//ange better if have time 
+			fprintf(stderr, "Error type 9 at Line %d: Function \"%s\" is not applicable for arguments that you write.\n", node->child->lineno, node->child->val); 
+			return NULL;//ange better if have time 
 		}
 		else {return s->type;}
 			}break;

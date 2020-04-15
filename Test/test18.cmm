@@ -1,8 +1,7 @@
-int func(int a[20][10]);
-int func(int a[20][10], int b);
-int func(int v[10][20]){}
-
-int main() {
-	int l[10][10];
-	func(l);
+struct A;
+int;
+int main()
+{
+	struct A{int a;} b;
+	b.a=1;
 }
