@@ -1,6 +1,6 @@
 #include "syntaxtree.h"
 #include "symtab.h"
-
+struct SymTable* symtable;
 void Program(Node* node);
 void ExtDefList(Node* node);
 void ExtDef(Node* node);

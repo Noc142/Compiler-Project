@@ -20,7 +20,7 @@ enum nonterminal {
 	num_Exp, num_Args
 };
 
-struct SymTable* symtable;
+
 int hidNameInt = 1;
 int hidNameFunc = 1;
 Type type_int;//for return type of int constant;

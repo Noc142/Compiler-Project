@@ -1,11 +1,12 @@
 #include "syntaxtree.h"
 #include <stdio.h>
 #include "semantic.h"
-
+#include "translate.h"
 int errorLexical = 0;
 int errorSyntax = 0;
 struct ASTNode *treeroot;
 extern int yyparse();
+extern struct InterCodes * codes;
 extern void yyrestart(FILE *);
 
 int main(int argc, char **argv) {
@@ -27,6 +28,8 @@ int main(int argc, char **argv) {
 	if (errorLexical || errorSyntax) return 0;
 	//preOrderShow(treeroot, 0);
 	Program(treeroot);
+	translate_Program(treeroot);
+	printCodes(codes, stdout);
 	deleteTree(treeroot);
 	return 0;
 }
