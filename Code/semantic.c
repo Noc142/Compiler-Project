@@ -81,6 +81,8 @@ void Program(Node *root)
 	type_float=(Type)malloc(sizeof(struct Type_));
 	type_int->kind = BASIC; type_int->u.basic = 0;
 	type_float->kind = BASIC; type_float->u.basic = 1;
+	SymInsert_func(symtable, "read", type_int, NULL, 1, 0);
+	SymInsert_func(symtable, "write", type_int, newSymbol_func_var("#write", type_int), 1, 0);
 	ExtDefList(root->child);
 	for (int i = 0; i < DEFAULT_HASH_SIZE; i++)
 	{

@@ -17,7 +17,8 @@ void translate_CompSt(Node* node);
 void translate_StmtList(Node* node);
 void translate_Stmt(Node* node);
 void translate_Exp(Node* node, Operand place);
-void translate_Cond(Node *node, Operand label1, Operand label2);
+void translate_Cond(Node *node, Operand label_true, Operand label_false);
+void translate_Args(Node *node, struct ArgNode **arg_list);
 
 
 #endif
