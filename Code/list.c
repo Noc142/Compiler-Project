@@ -1,7 +1,8 @@
 #include "list.h"
 #include <stdlib.h>
 #include <stdarg.h>
-
+#include <string.h>
+extern int var_no;
 struct InterCodes * newCodeHead() {
 	struct InterCodes* head = (struct InterCodes *) malloc(sizeof(struct InterCodes));
 	head->prev = head;
@@ -47,6 +48,11 @@ void makeCode(struct InterCode *code, int kind, ...) {
 			code->u.assign.left = (Operand) va_arg(ap, Operand);
 			code->u.assign.right = (Operand) va_arg(ap, Operand);
 		} break;
+		case DEC: {
+			code->u.dec.op= (Operand)va_arg(ap, Operand);
+			code->u.dec.memory= (Operand)va_arg(ap, Operand);
+			break;
+		}
 		case ADD: 
 		case SUB:
 		case MUL:
@@ -93,7 +99,6 @@ Operand new_var(char *name) {
 Operand new_label(int *no) {
 	Operand ret = (Operand) malloc(sizeof(struct Operand_));
 	ret->kind = ADDRESS;
-	ret->u.name = (char *) malloc(40);
 	ret->u.var_no = *no;
 	(*no)++;
 	return ret;
@@ -101,7 +106,6 @@ Operand new_label(int *no) {
 Operand new_temp(int *no) {
 	Operand ret = (Operand) malloc(sizeof(struct Operand_));
 	ret->kind = TMPVAR;
-	ret->u.name = (char *) malloc(40);
 	ret->u.var_no = *no;
 	(*no)++;
 	return ret;
@@ -119,6 +123,36 @@ Operand new_const(int value) {
 	//printf("value: %d", value);
 	return ret;
 }
+Operand new_memory(int value) {
+	Operand ret = (Operand)malloc(sizeof(struct Operand_));
+	ret->kind = MEMORY;
+	ret->u.value = value;
+	return ret;
+}
+Operand new_array(char* name)
+{
+	Operand ret = (Operand)malloc(sizeof(struct Operand_));
+	ret->kind = ARRAYNAME;
+	ret->u.name = name;
+	return ret;
+}
+Operand new_arrayaddress(int* no,int star)
+{
+	Operand ret = (Operand)malloc(sizeof(struct Operand_));
+	ret->kind = ARRADDRESS;
+	ret->u.var_no = *no;
+	ret->star = star;
+	(*no)++;
+	return ret;
+}
+Operand copyop(Operand op)
+{
+	Operand ret = (Operand)malloc(sizeof(struct Operand_));
+	ret->kind = op->kind;
+	ret->u = op->u;
+	ret->star = op->star;
+	return ret;
+}
 void printCodes(struct InterCodes *codes, FILE *stream) {
 	struct InterCodes *cur = codes->next;
 	while (cur != codes) {
@@ -129,12 +163,14 @@ void printCodes(struct InterCodes *codes, FILE *stream) {
 
 void printInterCode(struct InterCode *code, FILE *stream) { //attention!! InterCode* but not InterCodes*
 	if (code->kind == ASSIGN) {
+		if (code->u.assign.left == NULL) return;
 		printOperand(code->u.assign.left, stream);
 		fprintf(stream, " := ");
 		printOperand(code->u.assign.right, stream);
 		fprintf(stream, "\n");		
 	}
 	else if (code->kind >= ADD && code->kind <= DIV) {
+		if (code->u.binop.result == NULL) return;
 		printOperand(code->u.binop.result, stream);
 		fprintf(stream, " := ");
 		printOperand(code->u.binop.op1, stream);
@@ -153,7 +189,9 @@ void printInterCode(struct InterCode *code, FILE *stream) { //attention!! InterC
 		fprintf(stream, " :\n");
 	}
 	else if (code->kind == CALL) {
-		printOperand(code->u.callop.result, stream);
+		if (code->u.callop.result == NULL)
+			fprintf(stream,  "tempnouse"); // place == NULL
+		else printOperand(code->u.callop.result, stream);
 		fprintf(stream, " := CALL %s\n", code->u.callop.funcname);
 	}
 	else if (code->kind == LABEL) {
@@ -164,6 +202,12 @@ void printInterCode(struct InterCode *code, FILE *stream) { //attention!! InterC
 	else if (code->kind == GOTOOP) {
 		fprintf(stream, "GOTO ");
 		printOperand(code->u.gotoop.L, stream);
+		fprintf(stream, "\n");
+	}
+	else if (code->kind == DEC) {
+		fprintf(stream, "DEC ");
+		printOperand(code->u.dec.op, stream);
+		printOperand(code->u.dec.memory, stream);
 		fprintf(stream, "\n");
 	}
 	else if (code->kind == PARAM) {
@@ -204,10 +248,14 @@ void printInterCode(struct InterCode *code, FILE *stream) { //attention!! InterC
 
 void printOperand(Operand op, FILE *stream) {
 	switch (op->kind) {
-		case VARIABLE: fprintf(stream, "%s", op->u.name); break;
+		case VARIABLE: fprintf(stream, "v%s", op->u.name); break;
 		case CONSTANT: fprintf(stream, "#%d", op->u.value); break;
 		case TMPVAR: fprintf(stream, "t%d", op->u.var_no); break;
 		case FUNCTION: fprintf(stream, "%s", op->u.name); break;
 		case ADDRESS: fprintf(stream, "label%d", op->u.var_no); break;
+		case MEMORY: fprintf(stream, " %d", op->u.value); break;
+		case ARRAYNAME: fprintf(stream, "&v%s", op->u.name); break;
+		case ARRADDRESS: {if(op->star) fprintf(stream, "*t%d", op->u.var_no);
+							else fprintf(stream, "t%d", op->u.var_no); } break;
 	}
 }

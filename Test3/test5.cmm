@@ -1,0 +1,10 @@
+int shit(int a,int b)
+{
+	return 2;
+}
+int main()
+{
+	shit(1,2);
+	return 0;
+}
+

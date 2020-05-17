@@ -10,6 +10,8 @@
 #define TYPE_FLOAT 1
 #define FUN_DEFINE 1
 #define FUN_DECLARATION 0
+int have_struct = 0;
+int have_error = 0;
 
 enum nonterminal {
 	num_Program = 1001, num_ExtDefList, num_ExtDef, num_ExtDecList,
@@ -365,7 +367,7 @@ Type Specifier(Node* node)
 }
 Type StructSpecifier(Node* node)
 {
-	
+	have_struct = 1;
 	if (node->child->next->type==num_OptTag)
 	{
 		Type type = (Type)malloc(sizeof(struct Type_));

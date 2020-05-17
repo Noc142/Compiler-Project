@@ -8,6 +8,8 @@ struct ASTNode *treeroot;
 extern int yyparse();
 extern struct InterCodes * codes;
 extern void yyrestart(FILE *);
+extern int have_struct;
+extern int have_error;
 
 int main(int argc, char **argv) {
 	if (argc == 1) {
@@ -28,8 +30,18 @@ int main(int argc, char **argv) {
 	if (errorLexical || errorSyntax) return 0;
 	//preOrderShow(treeroot, 0);
 	Program(treeroot);
-	translate_Program(treeroot);
-	printCodes(codes, stdout);
+	//if (have_error == 1) return 0;
+	if (argc == 3) {
+		FILE *interoutput = fopen(argv[2], "w");
+		if (have_struct == 1) {
+			printf("Cannot translate: Code contains variables or parameters of structure type.\n");
+			fprintf(interoutput, "Cannot translate: Code contains variables or parameters of structure type.\n");
+		}
+		else {
+			translate_Program(treeroot);
+			printCodes(codes, interoutput);
+		}
+	}
 	deleteTree(treeroot);
 	return 0;
 }

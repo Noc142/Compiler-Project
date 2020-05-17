@@ -1,0 +1,24 @@
+int fa() {
+	int i, in;
+	i = 0;
+	while (i < 5) {
+		in = read();
+		i = i + 1;
+	}
+	return 0;
+}
+int fb() {
+	int j, jn;
+	j = 0;
+	while (j < 5) {
+		jn = read();
+		j = j + 1;
+	}
+	return 0;
+}
+
+int main() {
+	fa();
+	fb();
+	return 0;
+}

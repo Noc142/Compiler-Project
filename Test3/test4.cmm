@@ -1,0 +1,11 @@
+int shit()
+{
+	return 2;
+}
+int main()
+{
+	int c;
+	c=shit();
+	write(c);
+	return 0;
+}
