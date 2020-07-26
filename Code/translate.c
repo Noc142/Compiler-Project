@@ -371,10 +371,10 @@ void translate_Exp(Node* node, Operand place)
 			makeCode(&code, WRITE, arg_list->op);
 			InsertCode(codes, code);
 			if (place != NULL) {
-				InterCode code1;
-				Operand constant = new_const(0);
-				makeCode(&code1, ASSIGN, place, constant);
-				InsertCode(codes, code1);
+			    InterCode code1;
+			    Operand constant = new_const(0);
+			    makeCode(&code1, ASSIGN, place, constant);
+			    InsertCode(codes, code1);
 			}
 			return;
 		}

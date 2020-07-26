@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "semantic.h"
 #include "translate.h"
+#include "object.h"
 int errorLexical = 0;
 int errorSyntax = 0;
 struct ASTNode *treeroot;
@@ -39,7 +40,8 @@ int main(int argc, char **argv) {
 		}
 		else {
 			translate_Program(treeroot);
-			printCodes(codes, interoutput);
+			//printCodes(codes, stdout);
+			objTranslate(interoutput);
 		}
 	}
 	deleteTree(treeroot);

@@ -196,7 +196,7 @@ void printInterCode(struct InterCode *code, FILE *stream) { //attention!! InterC
 	}
 	else if (code->kind == LABEL) {
 		fprintf(stream, "LABEL ");
-		printOperand(code->u.gotoop.L, stream);
+		printOperand(code->u.x, stream);
 		fprintf(stream, " :\n");
 	}
 	else if (code->kind == GOTOOP) {
@@ -226,7 +226,10 @@ void printInterCode(struct InterCode *code, FILE *stream) { //attention!! InterC
 	}
 	else if (code->kind == READ) {
 		fprintf(stream, "READ ");
-		printOperand(code->u.x, stream);
+		if (code->u.x == NULL) {
+		    fprintf(stream, "tread");
+		}
+		else printOperand(code->u.x, stream);
 		fprintf(stream, "\n");
 	}
 	else if (code->kind == WRITE) {
